@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>赤尾 CHIWEI — 薄，是最高级的保护</title>
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --red: #e65c4b;
+    --ice: rgba(255,255,255,0.06);
+    --ice-strong: rgba(255,255,255,0.12);
+    --text: rgba(255,255,255,0.78);
+    --text-dim: rgba(255,255,255,0.38);
+    --ease: cubic-bezier(0.42, 0, 0.58, 1);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "PingFang SC", sans-serif;
+    font-weight: 200;
+    letter-spacing: 0.04em;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  #bg-canvas {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  }
+
+  .section {
+    position: relative; width: 100%; height: 100vh; height: 100dvh;
+    scroll-snap-align: start; scroll-snap-stop: always;
+    overflow: hidden; z-index: 1;
+  }
+  .section-inner {
+    position: relative; width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .section-canvas {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  }
+  .section-canvas.interactive {
+    pointer-events: auto; touch-action: none;
+  }
+  .section-label {
+    position: absolute; top: 32px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; font-weight: 300; letter-spacing: 0.2em;
+    color: var(--text-dim); text-transform: uppercase;
+    z-index: 10; pointer-events: none;
+  }
+
+  /* M1: Light Slit */
+  #m1-hint {
+    position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
+    font-size: 12px; letter-spacing: 0.15em; color: var(--text-dim);
+    z-index: 10; pointer-events: none;
+    animation: hintPulse 3s ease-in-out infinite;
+  }
+  @keyframes hintPulse { 0%,100%{opacity:0.25} 50%{opacity:0.7} }
+  #m1-slit-value {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    font-size: 52px; font-weight: 100; letter-spacing: 0.08em;
+    color: transparent; z-index: 10; pointer-events: none;
+    transition: color 0.8s var(--ease);
+  }
+  #m1-slit-value.show {
+    color: var(--red); text-shadow: 0 0 40px rgba(230,92,75,0.3);
+  }
+
+  /* M2 */
+  #m2-info, #m2-hint {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    z-index: 10; pointer-events: none; text-align: center;
+  }
+  #m2-info { bottom: 44px; font-size: 11px; letter-spacing: 0.12em; color: var(--text-dim); }
+  #m2-hint { bottom: 80px; font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.18); animation: hintPulse 4s ease-in-out infinite; }
+
+  /* M3 */
+  #m3-text {
+    position: absolute; top: 48%; left: 50%; transform: translate(-50%,-50%);
+    font-size: 18px; font-weight: 200; letter-spacing: 0.2em; color: var(--text);
+    z-index: 5; pointer-events: none; transition: opacity 0.6s var(--ease);
+  }
+  #m3-pressure-display {
+    position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
+    font-family: "SF Mono","Menlo","Consolas",monospace;
+    font-size: 13px; font-variant-numeric: tabular-nums; color: var(--red);
+    z-index: 10; pointer-events: none; opacity: 0; transition: opacity 0.4s;
+  }
+
+  /* M4 */
+  #m4-slogan {
+    position: absolute; top: 45%; left: 50%; transform: translate(-50%,-50%);
+    font-size: 28px; font-weight: 100; letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.85); z-index: 10; pointer-events: none;
+    will-change: transform;
+  }
+
+  /* M5 */
+  #m5-container {
+    position: absolute; inset: 80px 40px 80px 40px; z-index: 5;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  #m5-line {
+    position: absolute; left: 40px; top: 80px; bottom: 80px;
+    width: 1px; background: var(--ice-strong); z-index: 4;
+  }
+  .m5-item {
+    position: relative; display: flex; align-items: center;
+    padding: 28px 0 28px 70px;
+    opacity: 0.18; transition: opacity 0.8s var(--ease);
+  }
+  .m5-item.active { opacity: 1; }
+  .m5-ring-wrapper {
+    position: absolute; left: 40px; width: 28px; height: 28px;
+    transform: translate(-50%,-50%);
+  }
+  .m5-ring-wrapper svg { width: 100%; height: 100%; transform: rotate(-90deg); display: block; }
+  .m5-ring-bg { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 1.5; }
+  .m5-ring-progress {
+    fill: none; stroke: var(--red); stroke-width: 1.5;
+    stroke-linecap: round; transition: stroke-dashoffset 1.8s var(--ease);
+  }
+  .m5-ring-pulse { filter: drop-shadow(0 0 8px rgba(230,92,75,0.5)); }
+  .m5-info { flex: 1; pointer-events: none; }
+  .m5-name { font-size: 13px; font-weight: 300; letter-spacing: 0.1em; color: var(--text); }
+  .m5-value {
+    font-family: "SF Mono","Menlo","Consolas",monospace;
+    font-size: 11px; font-variant-numeric: tabular-nums;
+    color: var(--red); margin-top: 4px; letter-spacing: 0.05em;
+  }
+
+  /* M6 CTA */
+  #m6-cta { position: relative; z-index: 10; text-align: center; cursor: none; }
+  #m6-cta-text { font-size: 20px; font-weight: 200; letter-spacing: 0.3em; color: var(--text); }
+  #m6-cta-line { width: 80px; height: 2px; background: var(--red); margin: 18px auto 0; transition: width 0.5s var(--ease); }
+  #m6-custom-cursor {
+    position: fixed; width: 12px; height: 12px; border-radius: 50%;
+    background: var(--red); pointer-events: none; z-index: 999;
+    opacity: 0; transform: translate(-50%,-50%); mix-blend-mode: screen;
+    box-shadow: 0 0 16px rgba(230,92,75,0.6); transition: opacity 0.2s;
+  }
+  #m6-form-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none; opacity: 0; transition: opacity 0.7s var(--ease);
+  }
+  #m6-form-overlay.show { opacity: 1; pointer-events: auto; }
+  #m6-form-overlay::before {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(10,10,12,0.85);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  }
+  #m6-form-card {
+    position: relative; background: rgba(20,20,24,0.95);
+    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 16px;
+    padding: 48px 40px; width: 90%; max-width: 380px; text-align: center;
+    transform: translateY(30px) scale(0.95);
+    transition: transform 0.7s var(--ease);
+  }
+  #m6-form-overlay.show #m6-form-card { transform: translateY(0) scale(1); }
+  #m6-form-card h3 { font-size: 18px; font-weight: 200; letter-spacing: 0.15em; margin-bottom: 32px; }
+  #m6-form-card input {
+    width: 100%; padding: 14px 16px; margin-bottom: 14px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; color: #fff; font-family: inherit;
+    font-size: 14px; font-weight: 300; letter-spacing: 0.05em;
+    outline: none; transition: border-color 0.3s;
+    -webkit-appearance: none; appearance: none;
+  }
+  #m6-form-card input:focus { border-color: var(--red); }
+  #m6-form-card .btn {
+    width: 100%; padding: 14px; margin-top: 8px;
+    background: var(--red); border: none; border-radius: 8px;
+    color: #fff; font-family: inherit; font-size: 14px;
+    font-weight: 300; letter-spacing: 0.2em; cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+  }
+  #m6-form-card .btn:hover { background: #f07363; transform: scale(1.02); }
+  #m6-form-card .btn:active { transform: scale(0.98); }
+  #m6-form-close {
+    position: absolute; top: 20px; right: 24px;
+    background: none; border: none; color: var(--text-dim);
+    font-size: 22px; cursor: pointer; transition: color 0.3s;
+  }
+  #m6-form-close:hover { color: #fff; }
+
+  /* Loading */
+  #loading-overlay {
+    position: fixed; inset: 0; z-index: 99999;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 0.8s var(--ease), visibility 0.8s;
+  }
+  #loading-overlay.hidden { opacity: 0; visibility: hidden; }
+  #loading-logo { font-size: 28px; font-weight: 100; letter-spacing: 0.3em; color: var(--text-dim); margin-bottom: 40px; }
+  #loading-particles { width: 120px; height: 120px; opacity: 0.6; }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    #m1-slit-value { font-size: 34px; }
+    #m4-slogan { font-size: 20px; }
+    #m5-container { inset: 60px 12px 60px 12px; }
+    #m5-line { left: 20px; }
+    .m5-item { padding-left: 42px; padding-top: 24px; padding-bottom: 24px; }
+    .m5-ring-wrapper { left: 20px; width: 22px; height: 22px; }
+    .m5-name { font-size: 11px; }
+    #m6-cta-text { font-size: 16px; }
+    #m6-form-card { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div id="loading-logo">CHIWEI</div>
+  <canvas id="loading-particles"></canvas>
+</div>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- M1 -->
+<section class="section" id="m1">
+  <div class="section-inner">
+    <span class="section-label">THINNESS</span>
+    <div id="m1-slit-value">0.01<span style="font-size:0.45em;vertical-align:super;margin-left:1px;">mm</span></div>
+    <canvas class="section-canvas interactive" id="m1-canvas"></canvas>
+    <div id="m1-hint">← 滑动探索 →</div>
+  </div>
+</section>
+
+<!-- M2 -->
+<section class="section" id="m2">
+  <div class="section-inner">
+    <span class="section-label">MATERIAL</span>
+    <canvas class="section-canvas interactive" id="m2-canvas"></canvas>
+    <div id="m2-hint">拖拽旋转 · 双击应力测试</div>
+    <div id="m2-info">聚氨酯分子结构 · 弹润韧</div>
+  </div>
+</section>
+
+<!-- M3 -->
+<section class="section" id="m3">
+  <div class="section-inner">
+    <span class="section-label">TOUCH</span>
+    <canvas class="section-canvas interactive" id="m3-canvas"></canvas>
+    <div id="m3-text">轻触，感知弹润</div>
+    <div id="m3-pressure-display">0.000</div>
+  </div>
+</section>
+
+<!-- M4 -->
+<section class="section" id="m4">
+  <div class="section-inner">
+    <span class="section-label">LUBRICATION</span>
+    <canvas class="section-canvas" id="m4-canvas"></canvas>
+    <div id="m4-slogan">顺滑，如无界</div>
+  </div>
+</section>
+
+<!-- M5 -->
+<section class="section" id="m5">
+  <div class="section-inner">
+    <span class="section-label">QUALITY</span>
+    <div id="m5-line"></div>
+    <div id="m5-container"></div>
+  </div>
+</section>
+
+<!-- M6 -->
+<section class="section" id="m6">
+  <div class="section-inner">
+    <span class="section-label">EXPLORE</span>
+    <canvas class="section-canvas interactive" id="m6-canvas"></canvas>
+    <div id="m6-cta">
+      <div id="m6-cta-text">探索赤尾</div>
+      <div id="m6-cta-line"></div>
+    </div>
+    <div id="m6-custom-cursor"></div>
+  </div>
+</section>
+
+<div id="m6-form-overlay">
+  <div id="m6-form-card">
+    <button id="m6-form-close" aria-label="关闭">&times;</button>
+    <h3>探索赤尾</h3>
+    <input type="text" placeholder="姓名">
+    <input type="tel" placeholder="手机号">
+    <input type="email" placeholder="邮箱（选填）">
+    <button class="btn">了解赤尾</button>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   THREE.JS LOADER — tries multiple CDNs with fallback
+   ================================================================ */
+(function loadThreeJS() {
+  if (typeof THREE !== 'undefined') { onThreeReady(); return; }
+
+  var urls = [
+    'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js',
+    'https://unpkg.com/three@0.160.0/build/three.min.js',
+    'https://cdn.bootcdn.net/ajax/libs/three.js/0.160.0/three.min.js'
+  ];
+
+  var idx = 0;
+  function tryNext() {
+    if (idx >= urls.length) {
+      console.warn('All Three.js CDNs failed. Running without 3D modules.');
+      onThreeReady();
+      return;
+    }
+    var s = document.createElement('script');
+    s.src = urls[idx];
+    s.onload = function() { console.log('Three.js loaded from:', urls[idx]); onThreeReady(); };
+    s.onerror = function() { idx++; tryNext(); };
+    document.head.appendChild(s);
+  }
+  tryNext();
+})();
+
+function onThreeReady() {
+  var THREE_READY = (typeof THREE !== 'undefined');
+
+  (function() {
+  'use strict';
+
+  var easeCurve = 'cubic-bezier(0.42, 0, 0.58, 1)';
+  var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    || (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
+  var particleMul = isMobile ? 0.33 : 1.0;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function vibrate(ms) {
+    if (navigator.vibrate) { try { navigator.vibrate(ms); } catch(e) {} }
+  }
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+  function getSize() { return { w: window.innerWidth, h: window.innerHeight }; }
+
+  // ===================== SAFETY TIMEOUT =====================
+  setTimeout(function() {
+    var overlay = document.getElementById('loading-overlay');
+    if (overlay && !overlay.classList.contains('hidden')) {
+      console.warn('Loading timeout — forcing overlay hide');
+      overlay.classList.add('hidden');
+    }
+  }, 6000);
+
+  // ===================== GLOBAL BACKGROUND (Canvas 2D fallback) =====================
+  var bgCanvas = document.getElementById('bg-canvas');
+  var bgGl = null, bgProgram = null, bgVAO = null;
+  var scrollSmoothed = 0;
+  var bgIsWebGL2 = false;
+
+  function resizeBg() {
+    var s = getSize();
+    bgCanvas.width = s.w * dpr;
+    bgCanvas.height = s.h * dpr;
+    bgCanvas.style.width = s.w + 'px';
+    bgCanvas.style.height = s.h + 'px';
+    if (bgGl) bgGl.viewport(0, 0, bgCanvas.width, bgCanvas.height);
+  }
+
+  function initBgShader() {
+    bgGl = bgCanvas.getContext('webgl2') || bgCanvas.getContext('webgl')
+      || bgCanvas.getContext('experimental-webgl');
+    if (!bgGl) { console.warn('No WebGL for background'); return; }
+
+    var gl = bgGl;
+    bgIsWebGL2 = (typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext);
+
+    var version = bgIsWebGL2 ? '#version 300 es\n' : '';
+    var vsIn = bgIsWebGL2 ? 'in' : 'attribute';
+    var vsOut = bgIsWebGL2 ? 'out' : 'varying';
+    var fsIn = bgIsWebGL2 ? 'in' : 'varying';
+    var fsOutDecl = bgIsWebGL2 ? 'out vec4 fragColor;\n' : '';
+    var fsOut = bgIsWebGL2 ? 'fragColor' : 'gl_FragColor';
+    var precision = bgIsWebGL2 ? 'precision highp float;\n' : 'precision highp float;\n';
+
+    var vsSrc = version + precision +
+      vsIn + ' vec2 a_pos;\n' +
+      vsOut + ' vec2 v_uv;\n' +
+      'void main() {\n' +
+      '  v_uv = a_pos * 0.5 + 0.5;\n' +
+      '  gl_Position = vec4(a_pos, 0.0, 1.0);\n' +
+      '}';
+
+    var fsSrc = version + precision + fsOutDecl +
+      fsIn + ' vec2 v_uv;\n' +
+      'uniform float u_time;\n' +
+      'uniform float u_scroll;\n' +
+      'uniform vec2 u_resolution;\n' +
+      'float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}\n' +
+      'float noise(vec2 p){vec2 i=floor(p);vec2 f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}\n' +
+      'float fbm(vec2 p){float v=0.0;float a=0.5;vec2 s=vec2(100.0);for(int i=0;i<4;i++){v+=a*noise(p);p=p*2.0+s;a*=0.5;}return v;}\n' +
+      'void main(){\n' +
+      '  vec2 uv=v_uv;vec2 st=uv*3.0;\n' +
+      '  float flow=sin(u_scroll*0.0008)*0.5+0.5;\n' +
+      '  float t=u_time*0.12;\n' +
+      '  float n1=fbm(st+vec2(t*flow,t*(1.0-flow)));\n' +
+      '  float n2=fbm(st*1.5+vec2(-t*0.6*(1.0-flow),t*0.4*flow)+3.0);\n' +
+      '  float silk=n1*0.55+n2*0.45;\n' +
+      '  silk=smoothstep(0.3,0.7,silk);\n' +
+      '  vec3 dark=vec3(0.039,0.039,0.047);\n' +
+      '  vec3 mid=vec3(0.06,0.06,0.07);\n' +
+      '  vec3 col=mix(dark,mid,silk*0.22);\n' +
+      '  float edge=smoothstep(0.35,0.65,abs(uv.x-0.5)*2.0);\n' +
+      '  col=mix(col,vec3(0.09,0.075,0.085),edge*silk*0.06);\n' +
+      '  ' + fsOut + '=vec4(col,0.95);\n' +
+      '}';
+
+    function mkShader(type, src) {
+      var s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.warn('BG shader error:', gl.getShaderInfoLog(s));
+      }
+      return s;
+    }
+
+    var vs = mkShader(gl.VERTEX_SHADER, vsSrc);
+    var fs = mkShader(gl.FRAGMENT_SHADER, fsSrc);
+    bgProgram = gl.createProgram();
+    gl.attachShader(bgProgram, vs);
+    gl.attachShader(bgProgram, fs);
+    gl.linkProgram(bgProgram);
+
+    var aPos = gl.getAttribLocation(bgProgram, 'a_pos');
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
+    if (bgIsWebGL2) { bgVAO = gl.createVertexArray(); gl.bindVertexArray(bgVAO); }
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    bgProgram.u_time = gl.getUniformLocation(bgProgram, 'u_time');
+    bgProgram.u_scroll = gl.getUniformLocation(bgProgram, 'u_scroll');
+    bgProgram.u_resolution = gl.getUniformLocation(bgProgram, 'u_resolution');
+  }
+
+  function drawBg(time, scroll) {
+    if (!bgGl || !bgProgram) return;
+    var gl = bgGl;
+    gl.useProgram(bgProgram);
+    scrollSmoothed = lerp(scrollSmoothed, scroll, 0.05);
+    gl.uniform1f(bgProgram.u_time, time);
+    gl.uniform1f(bgProgram.u_scroll, scrollSmoothed);
+    gl.uniform2f(bgProgram.u_resolution, bgCanvas.width, bgCanvas.height);
+    if (bgVAO) gl.bindVertexArray(bgVAO);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+  }
+
+  // ===================== LOADING SEQUENCE =====================
+  function initLoading() {
+    var overlay = document.getElementById('loading-overlay');
+    var logo = document.getElementById('loading-logo');
+    var loadCanvas = document.getElementById('loading-particles');
+    loadCanvas.width = 120 * dpr;
+    loadCanvas.height = 120 * dpr;
+    var ctx = loadCanvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    var parts = [];
+    for (var i = 0; i < 40; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var radius = 10 + Math.random() * 50;
+      parts.push({
+        x: 60 + Math.cos(angle) * radius,
+        y: 60 + Math.sin(angle) * radius,
+        tx: 60, ty: 60,
+        size: Math.random() * 1.8 + 0.5,
+        sp: Math.random() * 0.03 + 0.01,
+        alpha: Math.random() * 0.7 + 0.3
+      });
+    }
+
+    var progress = 0;
+    function animLoad() {
+      ctx.clearRect(0, 0, 120, 120);
+      progress = Math.min(progress + 0.01, 1);
+      var eased = easeOutCubic(progress);
+      logo.style.opacity = 0.3 + eased * 0.7;
+
+      for (var p = 0; p < parts.length; p++) {
+        var pt = parts[p];
+        pt.x = lerp(pt.x, pt.tx, pt.sp * 3);
+        pt.y = lerp(pt.y, pt.ty, pt.sp * 3);
+        var dist = Math.hypot(pt.x - 60, pt.y - 60);
+        var a = pt.alpha * (1 - dist / 60) * eased;
+        var g = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, pt.size * 2);
+        g.addColorStop(0, 'rgba(230,92,75,' + a + ')');
+        g.addColorStop(1, 'rgba(230,92,75,0)');
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, pt.size * 2, 0, Math.PI * 2);
+        ctx.fillStyle = g;
+        ctx.fill();
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(animLoad);
+      } else {
+        setTimeout(function() { overlay.classList.add('hidden'); }, 300);
+      }
+    }
+    requestAnimationFrame(animLoad);
+  }
+
+  // ===================== MODULE 1: LIGHT SLIT =====================
+  var m1 = {
+    canvas: null, renderer: null, scene: null, camera: null,
+    particles: null, geo: null, mat: null,
+    slitOpen: 0, targetSlit: 0,
+    dragging: false, dragStartX: 0, dragStartSlit: 0,
+    positions: null, velocities: null, count: 0,
+    active: false
+  };
+
+  function initM1() {
+    if (!THREE_READY) return;
+    try {
+      m1.canvas = document.getElementById('m1-canvas');
+      var s = getSize();
+      m1.canvas.width = s.w * dpr;
+      m1.canvas.height = s.h * dpr;
+      m1.canvas.style.width = s.w + 'px';
+      m1.canvas.style.height = s.h + 'px';
+
+      m1.renderer = new THREE.WebGLRenderer({ canvas: m1.canvas, alpha: true, antialias: false });
+      m1.renderer.setSize(s.w, s.h, false);
+      m1.renderer.setPixelRatio(dpr);
+      m1.scene = new THREE.Scene();
+      m1.camera = new THREE.PerspectiveCamera(45, s.w / s.h, 0.1, 100);
+      m1.camera.position.z = 7;
+
+      var count = Math.floor(150000 * particleMul);
+      m1.count = count;
+      var pos = new Float32Array(count * 3);
+      var vel = new Float32Array(count * 2);
+
+      for (var i = 0; i < count; i++) {
+        pos[i*3] = (Math.random() - 0.5) * 0.02;
+        pos[i*3+1] = (Math.random() - 0.5) * 5;
+        pos[i*3+2] = (Math.random() - 0.5) * 0.3;
+        var a = Math.random() * Math.PI * 2;
+        var sp = Math.random() * 0.4 + 0.06;
+        vel[i*2] = Math.cos(a) * sp;
+        vel[i*2+1] = Math.sin(a) * sp;
+      }
+
+      m1.geo = new THREE.BufferGeometry();
+      m1.geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+
+      m1.mat = new THREE.PointsMaterial({
+        size: 0.01, color: 0xe65c4b,
+        blending: THREE.AdditiveBlending, depthWrite: false,
+        transparent: true, opacity: 0.65
+      });
+
+      m1.particles = new THREE.Points(m1.geo, m1.mat);
+      m1.scene.add(m1.particles);
+      m1.positions = pos;
+      m1.velocities = vel;
+
+      var c = m1.canvas;
+      c.addEventListener('pointerdown', function(e) {
+        if (!m1.active) return;
+        m1.dragging = true;
+        m1.dragStartX = e.clientX;
+        m1.dragStartSlit = m1.targetSlit;
+      });
+      c.addEventListener('pointermove', function(e) {
+        if (!m1.dragging || !m1.active) return;
+        var dx = (e.clientX - m1.dragStartX) / s.w;
+        m1.targetSlit = clamp(m1.dragStartSlit + dx * 1.2, 0, 1);
+      });
+      var endDrag = function() {
+        if (!m1.dragging) return;
+        m1.dragging = false;
+        if (m1.targetSlit > 0.85) { m1.targetSlit = 1; vibrate(15); }
+        else m1.targetSlit = 0;
+      };
+      c.addEventListener('pointerup', endDrag);
+      c.addEventListener('pointerleave', endDrag);
+      c.addEventListener('touchstart', function(e) { if (e.touches.length===1) e.preventDefault(); }, { passive: false });
+      c.addEventListener('touchmove', function(e) { if (m1.dragging) e.preventDefault(); }, { passive: false });
+    } catch(e) { console.warn('M1 init failed:', e); }
+  }
+
+  function updateM1(dt) {
+    m1.slitOpen = lerp(m1.slitOpen, m1.targetSlit, 0.1);
+    var slitVal = document.getElementById('m1-slit-value');
+    var hint = document.getElementById('m1-hint');
+    slitVal.classList.toggle('show', m1.slitOpen > 0.05);
+    if (m1.slitOpen > 0.05) hint.style.opacity = '0';
+    else hint.style.opacity = '';
+
+    if (!m1.positions || m1.count === 0) return;
+    var pos = m1.positions, vel = m1.velocities;
+
+    for (var i = 0; i < m1.count; i++) {
+      var i3 = i * 3;
+      var d = Math.abs(pos[i3]);
+      var slitW = m1.slitOpen * 0.5 + 0.001;
+      var edge = clamp(d / slitW, 0.1, 3);
+      pos[i3]   += vel[i*2] * edge * m1.slitOpen * dt * 6;
+      pos[i3+1] += vel[i*2+1] * edge * m1.slitOpen * dt * 6;
+      if (Math.abs(pos[i3]) > 3 || Math.abs(pos[i3+1]) > 3) {
+        pos[i3] = (Math.random() - 0.5) * slitW * 2;
+        pos[i3+1] = (Math.random() - 0.5) * 0.2;
+        var a = Math.random() * Math.PI * 2;
+        var sp = Math.random() * 0.4 + 0.06;
+        vel[i*2] = Math.cos(a) * sp;
+        vel[i*2+1] = Math.sin(a) * sp;
+      }
+    }
+    m1.geo.attributes.position.needsUpdate = true;
+    m1.mat.opacity = 0.08 + m1.slitOpen * 0.65;
+  }
+
+  function drawM1() {
+    if (!m1.renderer || !m1.active) return;
+    m1.renderer.render(m1.scene, m1.camera);
+  }
+
+  // ===================== MODULE 2: MOLECULAR TORUS =====================
+  var m2 = {
+    canvas: null, renderer: null, scene: null, camera: null,
+    nodes: null, lines: null,
+    positions: null, base: null,
+    totalNodes: 0, seg: 0, rSeg: 0,
+    s: { theta: 0, phi: 0.3, radius: 5 },
+    ts: { theta: 0, phi: 0.3, radius: 5 },
+    rotating: true, isDrag: false, prev: { x: 0, y: 0 },
+    deformTarget: 0, deform: 0,
+    active: false
+  };
+
+  function initM2() {
+    if (!THREE_READY) return;
+    try {
+      m2.canvas = document.getElementById('m2-canvas');
+      var s = getSize();
+      m2.canvas.width = s.w * dpr;
+      m2.canvas.height = s.h * dpr;
+      m2.canvas.style.width = s.w + 'px';
+      m2.canvas.style.height = s.h + 'px';
+
+      m2.renderer = new THREE.WebGLRenderer({ canvas: m2.canvas, alpha: true, antialias: true });
+      m2.renderer.setSize(s.w, s.h, false);
+      m2.renderer.setPixelRatio(dpr);
+      m2.scene = new THREE.Scene();
+      m2.camera = new THREE.PerspectiveCamera(50, s.w / s.h, 0.1, 50);
+      m2.camera.position.set(0, 0, 5);
+
+      var R = 1.5, r = 0.55;
+      var seg = isMobile ? 40 : 60;
+      var rSeg = isMobile ? 16 : 24;
+      m2.seg = seg; m2.rSeg = rSeg;
+      var total = seg * rSeg;
+      m2.totalNodes = total;
+
+      var pos = new Float32Array(total * 3);
+      var base = new Float32Array(total * 3);
+
+      for (var i = 0; i < seg; i++) {
+        var th = (i / seg) * Math.PI * 2;
+        for (var j = 0; j < rSeg; j++) {
+          var ph = (j / rSeg) * Math.PI * 2;
+          var idx = i * rSeg + j;
+          var x = (R + r * Math.cos(ph)) * Math.cos(th);
+          var y = (R + r * Math.cos(ph)) * Math.sin(th);
+          var z = r * Math.sin(ph);
+          pos[idx*3] = base[idx*3] = x;
+          pos[idx*3+1] = base[idx*3+1] = y;
+          pos[idx*3+2] = base[idx*3+2] = z;
+        }
+      }
+
+      var nodeGeo = new THREE.BufferGeometry();
+      nodeGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      var nodeMat = new THREE.PointsMaterial({
+        size: 0.03, color: 0xffffff,
+        blending: THREE.AdditiveBlending, depthWrite: false,
+        transparent: true, opacity: 0.35
+      });
+      m2.nodes = new THREE.Points(nodeGeo, nodeMat);
+      m2.scene.add(m2.nodes);
+
+      var lineArr = [];
+      for (var i = 0; i < seg; i++) {
+        var ni = (i + 1) % seg;
+        for (var j = 0; j < rSeg; j++) {
+          var nj = (j + 1) % rSeg;
+          var a = i * rSeg + j;
+          var b = ni * rSeg + j;
+          var c = i * rSeg + nj;
+          lineArr.push(base[a*3],base[a*3+1],base[a*3+2],base[b*3],base[b*3+1],base[b*3+2]);
+          lineArr.push(base[a*3],base[a*3+1],base[a*3+2],base[c*3],base[c*3+1],base[c*3+2]);
+        }
+      }
+      var lineGeo = new THREE.BufferGeometry();
+      lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(lineArr, 3));
+      var lineMat = new THREE.LineBasicMaterial({
+        color: 0xffffff, transparent: true, opacity: 0.07,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      });
+      m2.lines = new THREE.LineSegments(lineGeo, lineMat);
+      m2.scene.add(m2.lines);
+
+      m2.positions = pos;
+      m2.base = base;
+
+      var c = m2.canvas;
+      c.addEventListener('pointerdown', function(e) {
+        if (!m2.active) return;
+        m2.isDrag = true; m2.rotating = false;
+        m2.prev.x = e.clientX; m2.prev.y = e.clientY;
+      });
+      c.addEventListener('pointermove', function(e) {
+        if (!m2.active || !m2.isDrag) return;
+        var dx = e.clientX - m2.prev.x, dy = e.clientY - m2.prev.y;
+        m2.ts.theta -= dx * 0.005;
+        m2.ts.phi -= dy * 0.005;
+        m2.ts.phi = clamp(m2.ts.phi, -Math.PI/2.3, Math.PI/2.3);
+        m2.prev.x = e.clientX; m2.prev.y = e.clientY;
+      });
+      var upM2 = function() {
+        m2.isDrag = false;
+        setTimeout(function() { if (!m2.isDrag) m2.rotating = true; }, 2000);
+      };
+      c.addEventListener('pointerup', upM2);
+      c.addEventListener('pointerleave', upM2);
+      c.addEventListener('wheel', function(e) {
+        if (!m2.active) return;
+        e.preventDefault();
+        m2.ts.radius = clamp(m2.ts.radius + e.deltaY * 0.005, 2.5, 10);
+      }, { passive: false });
+      c.addEventListener('dblclick', function() {
+        if (!m2.active) return;
+        m2.deformTarget = 1;
+        vibrate(10);
+        setTimeout(function() { m2.deformTarget = 0; vibrate(10); }, 1200);
+      });
+    } catch(e) { console.warn('M2 init failed:', e); }
+  }
+
+  function updateM2(dt) {
+    if (!m2.active) return;
+    if (m2.rotating) m2.ts.theta += dt * 0.25;
+    var s = m2.s, t = m2.ts;
+    s.theta = lerp(s.theta, t.theta, 0.06);
+    s.phi   = lerp(s.phi, t.phi, 0.06);
+    s.radius = lerp(s.radius, t.radius, 0.06);
+    m2.deform = lerp(m2.deform, m2.deformTarget, 0.05);
+    var wave = Math.sin(m2.deform * Math.PI);
+    var sy = 1 + wave * 0.45;
+    var sz = 1 - wave * 0.18;
+    var pos = m2.positions, base = m2.base;
+    for (var i = 0; i < m2.totalNodes; i++) {
+      pos[i*3] = base[i*3] * sz;
+      pos[i*3+1] = base[i*3+1] * sy;
+      pos[i*3+2] = base[i*3+2] * sz;
+    }
+    if (m2.nodes && m2.nodes.geometry) m2.nodes.geometry.attributes.position.needsUpdate = true;
+
+    if (m2.lines && m2.lines.geometry) {
+      var larr = m2.lines.geometry.attributes.position.array;
+      var li = 0;
+      for (var i = 0; i < m2.seg; i++) {
+        var ni = (i + 1) % m2.seg;
+        for (var j = 0; j < m2.rSeg; j++) {
+          var nj = (j + 1) % m2.rSeg;
+          var a = i * m2.rSeg + j;
+          var b = ni * m2.rSeg + j;
+          var c = i * m2.rSeg + nj;
+          larr[li++]=pos[a*3];larr[li++]=pos[a*3+1];larr[li++]=pos[a*3+2];
+          larr[li++]=pos[b*3];larr[li++]=pos[b*3+1];larr[li++]=pos[b*3+2];
+          larr[li++]=pos[a*3];larr[li++]=pos[a*3+1];larr[li++]=pos[a*3+2];
+          larr[li++]=pos[c*3];larr[li++]=pos[c*3+1];larr[li++]=pos[c*3+2];
+        }
+      }
+      m2.lines.geometry.attributes.position.needsUpdate = true;
+    }
+
+    if (m2.nodes && m2.nodes.material) m2.nodes.material.opacity = 0.3 + wave * 0.25;
+    if (m2.lines && m2.lines.material) m2.lines.material.opacity = 0.06 + wave * 0.1;
+
+    var cam = m2.camera;
+    if (cam) {
+      cam.position.x = s.radius * Math.sin(s.phi) * Math.cos(s.theta);
+      cam.position.y = s.radius * Math.sin(s.phi) * Math.sin(s.theta);
+      cam.position.z = s.radius * Math.cos(s.phi);
+      cam.lookAt(0, 0, 0);
+    }
+  }
+
+  function drawM2() {
+    if (!m2.renderer || !m2.active) return;
+    m2.renderer.render(m2.scene, m2.camera);
+  }
+
+  // ===================== MODULE 3: PRESSURE RIPPLES =====================
+  var m3 = {
+    canvas: null, ctx: null,
+    ripples: [],
+    pressing: false, pStart: 0, pressure: 0,
+    active: false
+  };
+
+  function initM3() {
+    try {
+      m3.canvas = document.getElementById('m3-canvas');
+      var s = getSize();
+      m3.canvas.width = s.w * dpr;
+      m3.canvas.height = s.h * dpr;
+      m3.canvas.style.width = s.w + 'px';
+      m3.canvas.style.height = s.h + 'px';
+      m3.ctx = m3.canvas.getContext('2d');
+
+      var c = m3.canvas;
+      c.addEventListener('pointerdown', function(e) {
+        if (!m3.active) return;
+        m3.pressing = true; m3.pStart = performance.now(); m3.pressure = 0;
+        m3.ripples.push({ x: e.clientX*dpr, y: e.clientY*dpr, radius: 0, pressure: 0, alive: true, fading: false, opacity: 1 });
+        document.getElementById('m3-text').style.opacity = '0.25';
+      });
+      c.addEventListener('pointermove', function(e) {
+        if (!m3.pressing || !m3.active) return;
+        m3.pressure = clamp((performance.now()-m3.pStart)/2000, 0, 1);
+        var r = m3.ripples[m3.ripples.length-1];
+        if (r && r.alive) { r.x = e.clientX*dpr; r.y = e.clientY*dpr; r.pressure = m3.pressure; }
+        document.getElementById('m3-pressure-display').textContent = (m3.pressure*100).toFixed(1);
+        document.getElementById('m3-pressure-display').style.opacity = '1';
+      });
+      var upM3 = function() {
+        if (!m3.pressing) return;
+        m3.pressing = false;
+        if (m3.pressure > 0.8) vibrate(20);
+        m3.ripples.forEach(function(r) { if (r.alive) r.fading = true; });
+        document.getElementById('m3-text').style.opacity = '1';
+        document.getElementById('m3-pressure-display').style.opacity = '0';
+      };
+      c.addEventListener('pointerup', upM3);
+      c.addEventListener('pointerleave', upM3);
+      c.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        m3.pressing = true; m3.pStart = performance.now();
+        for (var i = 0; i < e.touches.length; i++) {
+          m3.ripples.push({ x: e.touches[i].clientX*dpr, y: e.touches[i].clientY*dpr, radius: 0, pressure: e.touches[i].force||0.3, alive: true, fading: false, opacity: 1 });
+        }
+      }, { passive: false });
+      c.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+        if (!m3.active) return;
+        var p = clamp((performance.now()-m3.pStart)/2000, 0, 1);
+        for (var i = 0; i < Math.min(e.touches.length, m3.ripples.length); i++) {
+          if (m3.ripples[i] && m3.ripples[i].alive) {
+            m3.ripples[i].x = e.touches[i].clientX*dpr;
+            m3.ripples[i].y = e.touches[i].clientY*dpr;
+            m3.ripples[i].pressure = e.touches[i].force || p;
+          }
+        }
+      }, { passive: false });
+    } catch(e) { console.warn('M3 init failed:', e); }
+  }
+
+  function updateM3(dt) {
+    if (!m3.active) return;
+    for (var i = m3.ripples.length-1; i >= 0; i--) {
+      var r = m3.ripples[i];
+      if (!r.alive) { m3.ripples.splice(i,1); continue; }
+      if (r.fading) {
+        r.opacity -= dt * 1.8;
+        if (r.opacity <= 0) { r.alive = false; continue; }
+      } else {
+        var gr = 250 + r.pressure*500;
+        r.radius += gr * dt;
+        if (r.pressure > 0.8 && r.radius > 180) r.radius -= 80*dt;
+      }
+    }
+  }
+
+  function drawM3() {
+    if (!m3.ctx || !m3.active) return;
+    var ctx = m3.ctx, w = m3.canvas.width, h = m3.canvas.height;
+    ctx.clearRect(0,0,w,h);
+    ctx.globalCompositeOperation = 'screen';
+    for (var ri = 0; ri < m3.ripples.length; ri++) {
+      var r = m3.ripples[ri];
+      if (!r.alive) continue;
+      for (var k = 0; k < 5; k++) {
+        var rr = r.radius - k*28;
+        if (rr <= 0) continue;
+        var a = r.opacity * (1 - k/5) * 0.45;
+        var g = ctx.createRadialGradient(r.x, r.y, rr*0.6, r.x, r.y, rr);
+        g.addColorStop(0, 'rgba(230,92,75,'+a+')');
+        g.addColorStop(0.55, 'rgba(230,92,75,'+(a*0.35)+')');
+        g.addColorStop(1, 'rgba(230,92,75,0)');
+        ctx.beginPath(); ctx.arc(r.x, r.y, rr, 0, Math.PI*2);
+        ctx.fillStyle = g; ctx.fill();
+      }
+    }
+  }
+
+  // ===================== MODULE 4: FLUID SIMULATION =====================
+  var m4 = {
+    canvas: null, renderer: null, scene: null, camera: null,
+    mesh: null,
+    tiltX: 0, tiltY: 0, targX: 0, targY: 0,
+    hasEntered: false,
+    active: false
+  };
+
+  function initM4() {
+    if (!THREE_READY) return;
+    try {
+      m4.canvas = document.getElementById('m4-canvas');
+      var s = getSize();
+      m4.canvas.width = s.w * dpr;
+      m4.canvas.height = s.h * dpr;
+      m4.canvas.style.width = s.w + 'px';
+      m4.canvas.style.height = s.h + 'px';
+
+      m4.renderer = new THREE.WebGLRenderer({ canvas: m4.canvas, alpha: true, antialias: true });
+      m4.renderer.setSize(s.w, s.h, false);
+      m4.renderer.setPixelRatio(dpr);
+      m4.scene = new THREE.Scene();
+      m4.camera = new THREE.PerspectiveCamera(60, s.w/s.h, 0.1, 50);
+      m4.camera.position.z = 3;
+
+      var segs = isMobile ? 64 : 128;
+      var geo = new THREE.PlaneGeometry(4.5, 4.5, segs, segs);
+      var mat = new THREE.ShaderMaterial({
+        uniforms: { u_time: {value:0}, u_tx: {value:0}, u_ty: {value:0} },
+        vertexShader: [
+          'varying vec2 vUv; varying vec3 vPos;',
+          'uniform float u_time, u_tx, u_ty;',
+          'void main(){',
+          'vUv=uv; vec3 p=position;',
+          'float w1=sin(p.x*3.0+u_time*1.2+u_tx*5.0)*cos(p.y*2.5+u_time*0.8+u_ty*4.0);',
+          'float w2=sin(p.x*5.5-u_time*0.7+u_tx*3.0)*cos(p.y*4.0+u_time*1.1+u_ty*6.0);',
+          'float w3=sin((p.x+p.y)*2.8+u_time*0.6)*cos((p.x-p.y)*3.3-u_time*0.9);',
+          'p.z+=w1*0.09+w2*0.06+w3*0.05;',
+          'p.z+=u_tx*p.x*0.15+u_ty*p.y*0.15;',
+          'vPos=p;',
+          'gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);',
+          '}'
+        ].join('\n'),
+        fragmentShader: [
+          'varying vec2 vUv; varying vec3 vPos;',
+          'uniform float u_time;',
+          'void main(){',
+          'vec3 base=vec3(0.07,0.08,0.09);',
+          'vec3 red=vec3(0.902,0.361,0.294);',
+          'float spec=pow(abs(vPos.z)*3.5,3.0);',
+          'float sheen=smoothstep(0.4,0.6,sin(vUv.x*30.0+u_time)*cos(vUv.y*25.0-u_time*0.7)*0.5+0.5)*0.12;',
+          'vec3 col=mix(base,red,spec*0.55);',
+          'col+=vec3(0.55,0.35,0.3)*sheen;',
+          'col*=0.55+(1.0-abs(vPos.z)*1.8)*0.45;',
+          'gl_FragColor=vec4(col,0.88);',
+          '}'
+        ].join('\n'),
+        transparent: true, side: THREE.DoubleSide
+      });
+      m4.mesh = new THREE.Mesh(geo, mat);
+      m4.scene.add(m4.mesh);
+
+      if (isMobile && window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', function(e) {
+          if (!m4.active) return;
+          if (e.beta !== null) m4.targY = clamp((e.beta-45)/45, -1, 1);
+          if (e.gamma !== null) m4.targX = clamp(e.gamma/45, -1, 1);
+        });
+      }
+      document.addEventListener('mousemove', function(e) {
+        if (!m4.active || isMobile) return;
+        m4.targX = (e.clientX/s.w - 0.5)*2;
+        m4.targY = (e.clientY/s.h - 0.5)*2;
+      });
+    } catch(e) { console.warn('M4 init failed:', e); }
+  }
+
+  function updateM4(dt, time) {
+    if (!m4.active) return;
+    m4.tiltX = lerp(m4.tiltX, m4.targX, 0.04);
+    m4.tiltY = lerp(m4.tiltY, m4.targY, 0.04);
+    if (m4.mesh) {
+      m4.mesh.material.uniforms.u_time.value = time;
+      m4.mesh.material.uniforms.u_tx.value = m4.tiltX;
+      m4.mesh.material.uniforms.u_ty.value = m4.tiltY;
+      m4.mesh.rotation.x = m4.tiltY * 0.25;
+      m4.mesh.rotation.y = m4.tiltX * 0.25;
+    }
+    var s = document.getElementById('m4-slogan');
+    if (s) s.style.transform = 'translate(-50%,-50%) translate('+(m4.tiltX*15)+'px,'+(m4.tiltY*15)+'px)';
+  }
+
+  function drawM4() {
+    if (!m4.renderer || !m4.active) return;
+    m4.renderer.render(m4.scene, m4.camera);
+  }
+
+  // ===================== MODULE 5: TIMELINE =====================
+  var m5 = {
+    items: [
+      { name: '电子针孔检测', target: 99.98 },
+      { name: '拉伸强度测试', target: 99.95 },
+      { name: '爆破极限测试', target: 99.97 },
+      { name: '润滑均匀度测试', target: 99.93 },
+      { name: '电子密封检验', target: 99.99 }
+    ],
+    elements: [],
+    triggered: false
+  };
+
+  function initM5() {
+    try {
+      var container = document.getElementById('m5-container');
+      var circ = 2 * Math.PI * 12;
+      m5.items.forEach(function(item) {
+        var d = document.createElement('div');
+        d.className = 'm5-item';
+        d.innerHTML =
+          '<div class="m5-ring-wrapper"><svg viewBox="0 0 28 28">' +
+          '<circle class="m5-ring-bg" cx="14" cy="14" r="12"/>' +
+          '<circle class="m5-ring-progress" cx="14" cy="14" r="12" stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+circ.toFixed(1)+'"/>' +
+          '</svg></div>' +
+          '<div class="m5-info"><div class="m5-name">'+item.name+'</div><div class="m5-value">0.00%</div></div>';
+        container.appendChild(d);
+        m5.elements.push(d);
+      });
+      var obs = new IntersectionObserver(function(entries) {
+        if (entries[0].isIntersecting && !m5.triggered) {
+          m5.triggered = true; runM5();
+        }
+      }, { threshold: 0.3 });
+      obs.observe(document.getElementById('m5'));
+    } catch(e) { console.warn('M5 init failed:', e); }
+  }
+
+  function runM5() {
+    var circ = 2 * Math.PI * 12;
+    m5.elements.forEach(function(el, i) {
+      var target = m5.items[i].target;
+      var prog = el.querySelector('.m5-ring-progress');
+      var valEl = el.querySelector('.m5-value');
+      var offset = circ * (1 - target/100);
+      setTimeout(function() {
+        el.classList.add('active');
+        prog.style.strokeDashoffset = offset.toString();
+        var dur = 1800, t0 = performance.now();
+        function tick(now) {
+          var p = Math.min((now-t0)/dur, 1);
+          valEl.textContent = (target*easeOutCubic(p)).toFixed(2)+'%';
+          if (p<1) requestAnimationFrame(tick);
+          else valEl.textContent = target.toFixed(2)+'%';
+        }
+        requestAnimationFrame(tick);
+        setTimeout(function() {
+          prog.classList.add('m5-ring-pulse');
+          setTimeout(function() { prog.classList.remove('m5-ring-pulse'); }, 500);
+        }, dur);
+      }, i*350);
+    });
+  }
+
+  // ===================== MODULE 6: CTA =====================
+  var m6 = {
+    canvas: null, ctx: null,
+    particles: [],
+    hovering: false, clicked: false,
+    active: false
+  };
+
+  function initM6() {
+    try {
+      m6.canvas = document.getElementById('m6-canvas');
+      var s = getSize();
+      m6.canvas.width = s.w * dpr;
+      m6.canvas.height = s.h * dpr;
+      m6.canvas.style.width = s.w + 'px';
+      m6.canvas.style.height = s.h + 'px';
+      m6.ctx = m6.canvas.getContext('2d');
+
+      var count = Math.floor(120 * particleMul);
+      var cw = m6.canvas.width, ch = m6.canvas.height;
+      for (var i = 0; i < count; i++) {
+        m6.particles.push({
+          x: Math.random()*cw, y: Math.random()*ch,
+          bx: Math.random()*cw, by: Math.random()*ch,
+          tx: cw/2+(Math.random()-0.5)*180, ty: ch/2+55,
+          size: Math.random()*2+0.5,
+          alpha: Math.random()*0.5+0.3,
+          ph: Math.random()*Math.PI*2,
+          sp: Math.random()*0.4+0.2
+        });
+      }
+
+      var cta = document.getElementById('m6-cta');
+      var cursor = document.getElementById('m6-custom-cursor');
+      cta.addEventListener('pointerenter', function() { m6.hovering = true; cursor.style.opacity = '1'; });
+      cta.addEventListener('pointermove', function(e) {
+        if (!m6.hovering) return;
+        cursor.style.left = e.clientX+'px'; cursor.style.top = e.clientY+'px';
+      });
+      cta.addEventListener('pointerleave', function() { m6.hovering = false; cursor.style.opacity = '0'; });
+      cta.addEventListener('click', function() {
+        m6.clicked = true; vibrate(30);
+        setTimeout(function() { document.getElementById('m6-form-overlay').classList.add('show'); }, 900);
+      });
+      document.getElementById('m6-form-close').addEventListener('click', function() {
+        document.getElementById('m6-form-overlay').classList.remove('show');
+        m6.clicked = false;
+      });
+    } catch(e) { console.warn('M6 init failed:', e); }
+  }
+
+  function updateM6(dt) {
+    if (!m6.active) return;
+    var cx = m6.canvas.width/2, cy = m6.canvas.height/2 + 55;
+    for (var i = 0; i < m6.particles.length; i++) {
+      var p = m6.particles[i];
+      if (m6.hovering) {
+        p.tx = cx + (p.bx-cx)*0.25 + Math.sin(p.ph+performance.now()*0.002)*7;
+        p.ty = cy + Math.sin(p.ph+performance.now()*0.003)*2;
+      } else { p.tx = p.bx; p.ty = p.by; }
+      p.x = lerp(p.x, p.tx, 0.07);
+      p.y = lerp(p.y, p.ty, 0.07);
+      if (m6.clicked) {
+        var dist = Math.hypot(p.x-cx, p.y-cy);
+        p.y += Math.sin(dist*0.02-performance.now()*0.004)*40*dt;
+        p.x += Math.cos(dist*0.02-performance.now()*0.004)*40*dt;
+      }
+    }
+  }
+
+  function drawM6() {
+    if (!m6.ctx || !m6.active) return;
+    var ctx = m6.ctx;
+    ctx.clearRect(0,0,m6.canvas.width,m6.canvas.height);
+    ctx.globalCompositeOperation = 'screen';
+    for (var i = 0; i < m6.particles.length; i++) {
+      var p = m6.particles[i];
+      var a = m6.hovering ? p.alpha*0.75 : p.alpha*0.2;
+      var g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*3);
+      g.addColorStop(0, 'rgba(230,92,75,'+a+')');
+      g.addColorStop(1, 'rgba(230,92,75,0)');
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.size*3,0,Math.PI*2);
+      ctx.fillStyle = g; ctx.fill();
+    }
+  }
+
+  // ===================== SECTION TRACKING =====================
+  var current = 'm1';
+
+  function updateActive() {
+    m1.active = (current==='m1');
+    m2.active = (current==='m2');
+    m3.active = (current==='m3');
+    m4.active = (current==='m4');
+    m6.active = (current==='m6');
+
+    if (current==='m4' && !m4.hasEntered) {
+      m4.hasEntered = true;
+      document.body.style.overflow = 'hidden';
+      setTimeout(function() { document.body.style.overflow = ''; }, 1500);
+    }
+    if (current!=='m4') m4.hasEntered = false;
+  }
+
+  var sectionObs = new IntersectionObserver(function(entries) {
+    for (var i = 0; i < entries.length; i++) {
+      if (entries[i].isIntersecting && entries[i].intersectionRatio > 0.5) {
+        current = entries[i].target.id;
+      }
+    }
+  }, { threshold: [0.5] });
+
+  document.querySelectorAll('.section').forEach(function(s) { sectionObs.observe(s); });
+
+  // ===================== MAIN LOOP =====================
+  var prevT = performance.now();
+
+  function loop(timestamp) {
+    requestAnimationFrame(loop);
+    var dt = (timestamp - prevT) / 1000;
+    if (dt > 0.1) dt = 0.1;
+    if (dt <= 0) dt = 1/60;
+    prevT = timestamp;
+    var time = timestamp * 0.001;
+
+    updateActive();
+    drawBg(time, window.scrollY);
+    updateM1(dt); drawM1();
+    updateM2(dt); drawM2();
+    updateM3(dt); drawM3();
+    updateM4(dt, time); drawM4();
+    updateM6(dt); drawM6();
+  }
+
+  // ===================== RESIZE =====================
+  function onResize() {
+    resizeBg();
+    var s = getSize();
+    [m1,m2,m4].forEach(function(mod) {
+      if (!mod.renderer) return;
+      mod.renderer.setSize(s.w, s.h, false);
+      if (mod.camera) { mod.camera.aspect = s.w/s.h; mod.camera.updateProjectionMatrix(); }
+    });
+    [m1,m2,m3,m4,m6].forEach(function(mod) {
+      if (!mod.canvas) return;
+      mod.canvas.width = s.w*dpr;
+      mod.canvas.height = s.h*dpr;
+      mod.canvas.style.width = s.w+'px';
+      mod.canvas.style.height = s.h+'px';
+    });
+  }
+  window.addEventListener('resize', onResize);
+  window.addEventListener('orientationchange', function() { setTimeout(onResize, 300); });
+
+  // ===================== INIT =====================
+  function init() {
+    resizeBg();
+    initBgShader();
+    initM1();
+    initM2();
+    initM3();
+    initM4();
+    initM5();
+    initM6();
+    m1.active = true;
+    initLoading();
+    requestAnimationFrame(loop);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  })();
+}
+</script>
+
+</body>
+</html>
