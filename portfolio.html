@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>七里水巷 — Photography Portfolio</title>
+<meta name="description" content="Fine art photography portfolio by 七里水巷. Venice, Europe, and beyond.">
+<style>
+/* ===== RESET ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a0a;
+  --bg-soft: #121212;
+  --bg-card: #161616;
+  --text: #f0eee9;
+  --text-dim: #8a8782;
+  --text-faint: #4a4845;
+  --accent: #c9a96e;
+  --accent-soft: rgba(201,169,110,0.15);
+  --line: rgba(240,238,233,0.08);
+  --line-strong: rgba(240,238,233,0.16);
+  --serif: 'Cormorant Garamond', 'Playfair Display', 'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;
+  --sans: 'Helvetica Neue', 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-slow: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  overflow-x: hidden;
+}
+
+body.loading { overflow: hidden; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+::selection { background: var(--accent); color: var(--bg); }
+
+/* Hide default cursor on desktop */
+@media (hover: hover) and (pointer: fine) {
+  body, a, button { cursor: none; }
+}
+
+/* ===== CUSTOM CURSOR ===== */
+.cursor-dot, .cursor-ring {
+  position: fixed; top: 0; left: 0; z-index: 10000;
+  pointer-events: none; border-radius: 50%;
+  mix-blend-mode: difference;
+}
+.cursor-dot {
+  width: 6px; height: 6px;
+  background: var(--text);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s var(--ease), height 0.3s var(--ease), opacity 0.3s;
+}
+.cursor-ring {
+  width: 32px; height: 32px;
+  border: 1px solid rgba(240,238,233,0.4);
+  transform: translate(-50%, -50%);
+  transition: width 0.4s var(--ease), height 0.4s var(--ease), border-color 0.3s, background 0.3s;
+}
+.cursor-ring.hover {
+  width: 64px; height: 64px;
+  border-color: var(--accent);
+  background: rgba(201,169,110,0.08);
+}
+.cursor-ring.click {
+  width: 24px; height: 24px;
+}
+@media (hover: none), (pointer: coarse) {
+  .cursor-dot, .cursor-ring { display: none; }
+}
+
+/* ===== NOISE OVERLAY ===== */
+.noise {
+  position: fixed; inset: 0; z-index: 9998; pointer-events: none;
+  opacity: 0.04; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ===== LOADER ===== */
+.loader {
+  position: fixed; inset: 0; z-index: 10001;
+  background: var(--bg);
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  gap: 32px;
+  transition: opacity 0.8s var(--ease), visibility 0.8s;
+}
+.loader.done { opacity: 0; visibility: hidden; }
+.loader-name {
+  font-family: var(--serif);
+  font-size: clamp(40px, 8vw, 80px);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  overflow: hidden;
+}
+.loader-name span {
+  display: inline-block;
+  transform: translateY(100%);
+  animation: loaderReveal 0.8s var(--ease-slow) forwards;
+}
+.loader-name span:nth-child(1) { animation-delay: 0.1s; }
+.loader-name span:nth-child(2) { animation-delay: 0.2s; color: var(--accent); font-style: italic; }
+.loader-name span:nth-child(3) { animation-delay: 0.3s; }
+.loader-name span:nth-child(4) { animation-delay: 0.4s; color: var(--accent); font-style: italic; }
+@keyframes loaderReveal {
+  to { transform: translateY(0); }
+}
+.loader-bar {
+  width: 200px; height: 1px; background: var(--line-strong);
+  position: relative; overflow: hidden;
+}
+.loader-bar::after {
+  content: ''; position: absolute; left: 0; top: 0; height: 100%;
+  width: 0; background: var(--accent);
+  animation: loaderProgress 1.6s var(--ease) 0.2s forwards;
+}
+@keyframes loaderProgress {
+  to { width: 100%; }
+}
+.loader-text {
+  font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--text-faint);
+  opacity: 0; animation: fadeUp 0.6s var(--ease) 0.8s forwards;
+}
+
+/* ===== NAV ===== */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 28px 48px;
+  display: flex; justify-content: space-between; align-items: center;
+  transition: all 0.6s var(--ease);
+  background: linear-gradient(180deg, rgba(10,10,10,0.5) 0%, transparent 100%);
+}
+.nav.scrolled {
+  padding: 16px 48px;
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+}
+.nav-logo {
+  font-family: var(--serif);
+  font-size: 22px; font-weight: 500;
+  letter-spacing: 0.15em;
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.nav-logo:hover { color: var(--accent); }
+.nav-menu {
+  display: flex; gap: 40px;
+  list-style: none;
+}
+.nav-menu a {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: color 0.4s var(--ease);
+  position: relative;
+}
+.nav-menu a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0;
+  width: 0; height: 1px; background: var(--accent);
+  transition: width 0.4s var(--ease);
+}
+.nav-menu a:hover { color: var(--text); }
+.nav-menu a:hover::after { width: 100%; }
+.nav-menu a.active { color: var(--text); }
+.nav-menu a.active::after { width: 100%; }
+.nav-burger {
+  display: none; flex-direction: column; gap: 5px; cursor: pointer;
+  background: none; border: none; padding: 8px;
+}
+.nav-burger span {
+  width: 24px; height: 1px; background: var(--text);
+  transition: all 0.4s var(--ease);
+}
+.nav-burger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-burger.open span:nth-child(2) { opacity: 0; }
+.nav-burger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* Mobile menu overlay */
+.nav-mobile {
+  position: fixed; inset: 0; z-index: 99;
+  background: var(--bg);
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  gap: 40px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.6s var(--ease);
+}
+.nav-mobile.open { opacity: 1; pointer-events: auto; }
+.nav-mobile a {
+  font-family: var(--serif);
+  font-size: 36px;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: color 0.3s, transform 0.4s var(--ease);
+  transform: translateY(20px);
+  opacity: 0;
+}
+.nav-mobile.open a {
+  transform: translateY(0);
+  opacity: 1;
+}
+.nav-mobile.open a:nth-child(1) { transition-delay: 0.1s; }
+.nav-mobile.open a:nth-child(2) { transition-delay: 0.15s; }
+.nav-mobile.open a:nth-child(3) { transition-delay: 0.2s; }
+.nav-mobile.open a:nth-child(4) { transition-delay: 0.25s; }
+.nav-mobile.open a:nth-child(5) { transition-delay: 0.3s; }
+.nav-mobile.open a:nth-child(6) { transition-delay: 0.35s; }
+.nav-mobile a:hover { color: var(--accent); }
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh; min-height: 100dvh;
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative;
+  padding: 120px 48px 60px;
+  overflow: hidden;
+}
+.hero-bg-wrapper {
+  position: absolute; inset: 0; z-index: 0;
+  overflow: hidden;
+}
+.hero-bg-slide {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  opacity: 0;
+  transition: opacity 2s var(--ease-slow);
+  animation: kenBurns 20s ease-in-out infinite alternate;
+}
+.hero-bg-slide.active { opacity: 1; }
+@keyframes kenBurns {
+  0% { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.15) translate(-2%, -3%); }
+}
+.hero-bg-overlay {
+  position: absolute; inset: 0; z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.3) 40%, rgba(10,10,10,0.75) 85%, rgba(10,10,10,0.95) 100%),
+    radial-gradient(ellipse at 30% 50%, transparent 0%, rgba(10,10,10,0.4) 70%);
+}
+.hero-bg-vignette {
+  position: absolute; inset: 0; z-index: 1;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(10,10,10,0.5) 100%);
+}
+.hero-content { position: relative; z-index: 2; max-width: 1400px; width: 100%; margin: 0 auto; }
+
+.hero-label {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 40px;
+  opacity: 0; animation: fadeUp 1s var(--ease) 0.3s forwards;
+}
+.hero-label .line {
+  width: 0; height: 1px; background: var(--accent);
+  animation: lineGrow 1s var(--ease) 0.5s forwards;
+}
+@keyframes lineGrow { to { width: 48px; } }
+.hero-label span {
+  font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--accent);
+}
+
+.hero-name {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(72px, 15vw, 220px);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  margin-bottom: 8px;
+  text-shadow: 0 4px 40px rgba(0,0,0,0.5);
+}
+.hero-name .word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(60px);
+  animation: fadeUp 1.2s var(--ease-slow) forwards;
+}
+.hero-name .word:nth-child(1) { animation-delay: 0.5s; margin-right: 0.15em; }
+.hero-name .word:nth-child(2) { animation-delay: 0.8s; }
+.hero-name .italic { font-style: italic; color: var(--accent); }
+
+.hero-subtitle {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(18px, 2.4vw, 28px);
+  color: var(--text);
+  margin-top: 24px;
+  max-width: 600px;
+  opacity: 0;
+  animation: fadeUp 1s var(--ease) 1.2s forwards;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+}
+
+.hero-meta {
+  display: flex; gap: 60px;
+  margin-top: 80px;
+  opacity: 0;
+  animation: fadeUp 1s var(--ease) 1.5s forwards;
+}
+.hero-meta-item .label {
+  font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--text-dim); margin-bottom: 6px;
+}
+.hero-meta-item .value {
+  font-family: var(--serif); font-size: 18px; color: var(--text);
+}
+
+.hero-scroll {
+  position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  opacity: 0; animation: fadeUp 1s var(--ease) 2s forwards;
+  z-index: 2;
+}
+.hero-scroll span { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); }
+.hero-scroll .arrow {
+  width: 1px; height: 40px; background: var(--line-strong);
+  position: relative; overflow: hidden;
+}
+.hero-scroll .arrow::after {
+  content: ''; position: absolute; top: -100%; left: 0;
+  width: 100%; height: 50%; background: var(--accent);
+  animation: scrollLine 2s var(--ease) infinite;
+}
+
+/* Hero background indicator dots */
+.hero-bg-dots {
+  position: absolute; bottom: 120px; right: 48px; z-index: 2;
+  display: flex; flex-direction: column; gap: 8px;
+  opacity: 0; animation: fadeUp 1s var(--ease) 2.2s forwards;
+}
+.hero-bg-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  border: 1px solid var(--text-dim);
+  background: transparent;
+  transition: all 0.4s var(--ease);
+  cursor: pointer;
+}
+.hero-bg-dot.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.3);
+}
+.hero-bg-dot:hover { border-color: var(--accent); }
+
+@keyframes scrollLine {
+  0% { top: -100%; } 100% { top: 200%; }
+}
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== MARQUEE ===== */
+.marquee {
+  overflow: hidden; padding: 24px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-soft);
+}
+.marquee-track {
+  display: flex; gap: 60px;
+  white-space: nowrap;
+  animation: marqueeScroll 30s linear infinite;
+}
+.marquee:hover .marquee-track { animation-play-state: paused; }
+.marquee-item {
+  font-family: var(--serif);
+  font-size: clamp(28px, 4vw, 52px);
+  font-style: italic;
+  color: var(--text-faint);
+  display: flex; align-items: center; gap: 60px;
+}
+.marquee-item .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0;
+}
+.marquee-item .accent { color: var(--accent); }
+@keyframes marqueeScroll {
+  to { transform: translateX(-50%); }
+}
+
+/* ===== SECTION COMMON ===== */
+.section {
+  padding: 140px 48px;
+  position: relative;
+}
+.section-inner { max-width: 1400px; margin: 0 auto; }
+
+.section-label {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 60px;
+}
+.section-label .num {
+  font-family: var(--mono); font-size: 12px; color: var(--accent);
+}
+.section-label .line { width: 40px; height: 1px; background: var(--line-strong); }
+.section-label .title {
+  font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim);
+}
+
+.section-heading {
+  font-family: var(--serif);
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin-bottom: 60px;
+  max-width: 900px;
+}
+.section-heading .italic { font-style: italic; color: var(--accent); }
+
+/* Reveal animation */
+.reveal {
+  opacity: 0; transform: translateY(40px);
+  transition: opacity 1s var(--ease), transform 1s var(--ease);
+}
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+/* Stagger children */
+.reveal-stagger > * {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+}
+.reveal-stagger.in > * { opacity: 1; transform: translateY(0); }
+.reveal-stagger.in > *:nth-child(1) { transition-delay: 0s; }
+.reveal-stagger.in > *:nth-child(2) { transition-delay: 0.08s; }
+.reveal-stagger.in > *:nth-child(3) { transition-delay: 0.16s; }
+.reveal-stagger.in > *:nth-child(4) { transition-delay: 0.24s; }
+.reveal-stagger.in > *:nth-child(5) { transition-delay: 0.32s; }
+.reveal-stagger.in > *:nth-child(6) { transition-delay: 0.40s; }
+.reveal-stagger.in > *:nth-child(7) { transition-delay: 0.48s; }
+.reveal-stagger.in > *:nth-child(8) { transition-delay: 0.56s; }
+
+/* ===== ABOUT ===== */
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+  align-items: start;
+}
+.about-text p {
+  font-family: var(--serif);
+  font-size: 20px; line-height: 1.8;
+  color: var(--text-dim);
+  margin-bottom: 24px;
+}
+.about-text p strong { color: var(--text); font-weight: 500; }
+.about-text .accent { color: var(--accent); font-style: italic; }
+
+.about-info {
+  display: flex; flex-direction: column; gap: 0;
+}
+.about-info-row {
+  display: flex; justify-content: space-between;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+  transition: padding 0.4s var(--ease);
+}
+.about-info-row:hover { padding-left: 12px; }
+.about-info-row .label { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-faint); }
+.about-info-row .value { font-family: var(--serif); font-size: 16px; color: var(--text); }
+
+/* ===== GALLERY ===== */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+}
+.gallery-item {
+  position: relative; overflow: hidden;
+  cursor: pointer;
+  background: var(--bg-card);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+.gallery-item-inner {
+  width: 100%; height: 100%;
+  transition: transform 0.1s linear;
+  transform-style: preserve-3d;
+}
+.gallery-item img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: grayscale(0.3) contrast(1.05) brightness(0.85);
+  transition: transform 1.2s var(--ease), filter 0.8s var(--ease);
+}
+.gallery-item:hover img {
+  transform: scale(1.08);
+  filter: grayscale(0) contrast(1.1) brightness(1);
+}
+.gallery-item .overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(10,10,10,0.9) 100%);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 32px;
+  opacity: 0; transition: opacity 0.6s var(--ease);
+}
+.gallery-item:hover .overlay { opacity: 1; }
+.gallery-item .overlay .cat {
+  font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 8px;
+  transform: translateY(20px); transition: transform 0.6s var(--ease) 0.1s;
+}
+.gallery-item .overlay .name {
+  font-family: var(--serif); font-size: 22px; color: var(--text);
+  transform: translateY(20px); transition: transform 0.6s var(--ease) 0.15s;
+}
+.gallery-item .overlay .loc {
+  font-size: 12px; color: var(--text-dim); margin-top: 4px;
+  letter-spacing: 0.05em;
+  transform: translateY(20px); transition: transform 0.6s var(--ease) 0.2s;
+}
+.gallery-item:hover .overlay .cat,
+.gallery-item:hover .overlay .name,
+.gallery-item:hover .overlay .loc { transform: translateY(0); }
+
+/* Gallery index number */
+.gallery-item .index {
+  position: absolute; top: 16px; left: 16px; z-index: 2;
+  font-family: var(--mono); font-size: 11px;
+  color: var(--text); opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+.gallery-item:hover .index { opacity: 0.6; }
+
+/* Gallery sizes */
+.g-large { grid-column: span 8; aspect-ratio: 3/2; }
+.g-tall { grid-column: span 4; aspect-ratio: 3/4; }
+.g-wide { grid-column: span 7; aspect-ratio: 4/3; }
+.g-square { grid-column: span 5; aspect-ratio: 1/1; }
+.g-half { grid-column: span 6; aspect-ratio: 4/5; }
+.g-third { grid-column: span 4; aspect-ratio: 1/1; }
+.g-full { grid-column: span 12; aspect-ratio: 21/9; }
+
+/* ===== VENICE FEATURE ===== */
+.venice-section {
+  padding: 140px 0;
+  background: var(--bg-soft);
+  position: relative;
+  overflow: hidden;
+}
+.venice-section .section-inner { padding: 0 48px; }
+.venice-layout {
+  display: grid; grid-template-columns: 1fr 1.2fr; gap: 80px;
+  align-items: center;
+}
+.venice-text .section-label { margin-bottom: 40px; }
+.venice-text h2 {
+  font-family: var(--serif);
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 400; line-height: 1.05;
+  margin-bottom: 32px;
+}
+.venice-text h2 .italic { font-style: italic; color: var(--accent); }
+.venice-text p {
+  font-family: var(--serif);
+  font-size: 19px; line-height: 1.9; color: var(--text-dim);
+  margin-bottom: 20px;
+}
+.venice-text .quote {
+  font-style: italic; font-size: 22px; color: var(--text);
+  border-left: 2px solid var(--accent);
+  padding-left: 24px; margin: 40px 0;
+}
+.venice-images {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.venice-images .vi {
+  overflow: hidden; aspect-ratio: 3/4;
+  position: relative;
+}
+.venice-images .vi:nth-child(2) { margin-top: 60px; }
+.venice-images .vi img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: grayscale(0.2) contrast(1.1);
+  transition: transform 1s var(--ease), filter 0.8s var(--ease);
+}
+.venice-images .vi:hover img { transform: scale(1.06); filter: grayscale(0) contrast(1.15); }
+
+/* ===== SERIES ===== */
+.series-list {
+  border-top: 1px solid var(--line);
+  position: relative;
+}
+.series-item {
+  display: grid; grid-template-columns: 60px 1fr 200px 120px;
+  align-items: center; gap: 24px;
+  padding: 32px 0;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  transition: padding 0.6s var(--ease), background 0.4s var(--ease);
+  position: relative; overflow: hidden;
+}
+.series-item::before {
+  content: ''; position: absolute; left: 0; bottom: 0;
+  width: 0; height: 1px; background: var(--accent);
+  transition: width 0.6s var(--ease);
+}
+.series-item:hover::before { width: 100%; }
+.series-item:hover { padding-left: 24px; }
+.series-item:hover .s-title { color: var(--accent); }
+.series-item:hover .s-arrow { opacity: 1; transform: translateX(0); }
+.s-num { font-family: var(--mono); font-size: 13px; color: var(--text-faint); }
+.s-title {
+  font-family: var(--serif); font-size: clamp(24px, 3vw, 38px);
+  font-weight: 400; color: var(--text);
+  transition: color 0.4s var(--ease);
+}
+.s-title .italic { font-style: italic; }
+.s-loc { font-size: 12px; letter-spacing: 0.1em; color: var(--text-dim); }
+.s-year { font-family: var(--mono); font-size: 13px; color: var(--text-faint); text-align: right; }
+.s-arrow {
+  position: absolute; right: 48px;
+  opacity: 0; transform: translateX(-20px);
+  transition: all 0.4s var(--ease);
+  color: var(--accent); font-size: 20px;
+}
+
+/* Series hover preview image */
+.series-preview {
+  position: fixed; z-index: 50; pointer-events: none;
+  width: 280px; height: 360px;
+  opacity: 0; transform: scale(0.8) translateY(20px);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+  overflow: hidden; border-radius: 2px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.series-preview.show { opacity: 1; transform: scale(1) translateY(0); }
+.series-preview img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: contrast(1.1) brightness(0.95);
+}
+
+/* ===== EXHIBITIONS ===== */
+.exhibitions-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+}
+.exh-col { padding: 0 40px; }
+.exh-col:first-child { border-right: 1px solid var(--line); padding-left: 0; }
+.exh-col-title {
+  font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 40px;
+}
+.exh-item {
+  padding: 24px 0; border-bottom: 1px solid var(--line);
+  transition: padding 0.4s var(--ease);
+}
+.exh-item:hover { padding-left: 16px; }
+.exh-item .year { font-family: var(--mono); font-size: 12px; color: var(--text-faint); margin-bottom: 8px; }
+.exh-item .title {
+  font-family: var(--serif); font-size: 20px; color: var(--text);
+  margin-bottom: 4px; font-weight: 400;
+  transition: color 0.3s;
+}
+.exh-item:hover .title { color: var(--accent); }
+.exh-item .title .italic { font-style: italic; }
+.exh-item .venue { font-size: 13px; color: var(--text-dim); }
+
+/* ===== CONTACT ===== */
+.contact {
+  text-align: center; padding: 160px 48px;
+  position: relative;
+}
+.contact-bg {
+  position: absolute; inset: 0; z-index: 0; opacity: 0.12;
+  background-image: url('https://images.unsplash.com/photo-1514890547357-a9ee288728e0?w=1920&q=85');
+  background-size: cover; background-position: center;
+  filter: grayscale(1);
+}
+.contact-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at center, transparent 0%, var(--bg) 80%);
+}
+.contact-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+.contact-label {
+  font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 40px;
+}
+.contact-heading {
+  font-family: var(--serif);
+  font-size: clamp(40px, 7vw, 96px);
+  font-weight: 400; line-height: 1.05;
+  margin-bottom: 48px;
+}
+.contact-heading .italic { font-style: italic; color: var(--accent); }
+.contact-email {
+  display: inline-block;
+  font-family: var(--serif); font-style: italic;
+  font-size: clamp(22px, 3vw, 32px);
+  color: var(--text); text-decoration: none;
+  border-bottom: 1px solid var(--line-strong);
+  padding-bottom: 4px;
+  transition: border-color 0.4s var(--ease), color 0.4s var(--ease);
+  position: relative;
+}
+.contact-email:hover { color: var(--accent); border-color: var(--accent); }
+
+.contact-socials {
+  display: flex; justify-content: center; gap: 32px;
+  margin-top: 60px;
+}
+.contact-socials a {
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--text-dim); text-decoration: none;
+  transition: color 0.3s, transform 0.3s var(--ease);
+  display: inline-block;
+}
+.contact-socials a:hover { color: var(--text); transform: translateY(-4px); }
+
+/* ===== FOOTER ===== */
+.footer {
+  padding: 40px 48px;
+  border-top: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 11px; letter-spacing: 0.1em; color: var(--text-faint);
+}
+.footer-logo { font-family: var(--serif); font-size: 16px; color: var(--text-dim); letter-spacing: 0.15em; }
+
+/* ===== LIGHTBOX ===== */
+.lightbox {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(8,8,8,0.96);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.6s var(--ease);
+}
+.lightbox.open { opacity: 1; pointer-events: auto; }
+.lightbox-img {
+  max-width: 85vw; max-height: 80vh;
+  object-fit: contain;
+  transform: scale(0.95); transition: transform 0.6s var(--ease);
+}
+.lightbox.open .lightbox-img { transform: scale(1); }
+.lightbox-close {
+  position: absolute; top: 32px; right: 32px;
+  width: 48px; height: 48px;
+  border: 1px solid var(--line-strong); border-radius: 50%;
+  background: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text); transition: all 0.3s;
+}
+.lightbox-close:hover { border-color: var(--accent); color: var(--accent); transform: rotate(90deg); }
+.lightbox-close svg { width: 16px; height: 16px; }
+.lightbox-info {
+  position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+  text-align: center;
+}
+.lightbox-info .cat { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); }
+.lightbox-info .name { font-family: var(--serif); font-size: 22px; color: var(--text); margin-top: 8px; }
+.lightbox-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 100%; display: flex; justify-content: space-between;
+  padding: 0 32px; pointer-events: none;
+}
+.lightbox-nav button {
+  pointer-events: auto;
+  width: 56px; height: 56px;
+  border: 1px solid var(--line-strong); border-radius: 50%;
+  background: rgba(10,10,10,0.5); cursor: pointer;
+  color: var(--text); transition: all 0.3s;
+  display: flex; align-items: center; justify-content: center;
+}
+.lightbox-nav button:hover { border-color: var(--accent); color: var(--accent); background: rgba(201,169,110,0.1); }
+.lightbox-nav svg { width: 20px; height: 20px; }
+.lightbox-counter {
+  position: absolute; top: 32px; left: 50%; transform: translateX(-50%);
+  font-family: var(--mono); font-size: 12px; color: var(--text-dim);
+  letter-spacing: 0.1em;
+}
+
+/* ===== PROGRESS BAR ===== */
+.progress {
+  position: fixed; top: 0; left: 0; height: 2px; z-index: 101;
+  background: var(--accent); width: 0;
+  transition: width 0.1s linear;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .nav { padding: 20px 32px; }
+  .nav.scrolled { padding: 14px 32px; }
+  .section { padding: 100px 32px; }
+  .hero { padding: 100px 32px 60px; }
+  .venice-section .section-inner { padding: 0 32px; }
+  .about-grid { grid-template-columns: 1fr; gap: 60px; }
+  .venice-layout { grid-template-columns: 1fr; gap: 60px; }
+  .exhibitions-grid { grid-template-columns: 1fr; }
+  .exh-col:first-child { border-right: none; border-bottom: 1px solid var(--line); padding: 0 0 40px; margin-bottom: 40px; }
+  .exh-col { padding: 0; }
+  .g-large, .g-wide, .g-half { grid-column: span 12; }
+  .g-tall, .g-square, .g-third { grid-column: span 6; }
+  .hero-bg-dots { display: none; }
+  .series-preview { display: none; }
+}
+
+@media (max-width: 700px) {
+  .nav { padding: 18px 24px; }
+  .nav.scrolled { padding: 12px 24px; }
+  .nav-menu { display: none; }
+  .nav-burger { display: flex; }
+  .section { padding: 80px 24px; }
+  .hero { padding: 100px 24px 60px; }
+  .venice-section .section-inner { padding: 0 24px; }
+  .venice-section { padding: 80px 0; }
+  .hero-meta { flex-wrap: wrap; gap: 32px; }
+  .series-item { grid-template-columns: 40px 1fr; gap: 16px; }
+  .series-item .s-loc, .series-item .s-year, .series-item .s-arrow { display: none; }
+  .g-large, .g-tall, .g-wide, .g-square, .g-half, .g-third { grid-column: span 12; aspect-ratio: 4/3; }
+  .venice-images { grid-template-columns: 1fr; }
+  .venice-images .vi:nth-child(2) { margin-top: 0; }
+  .contact { padding: 100px 24px; }
+  .footer { flex-direction: column; gap: 12px; text-align: center; }
+  .lightbox-nav { padding: 0 16px; }
+  .lightbox-nav button { width: 44px; height: 44px; }
+}
+
+/* ===== FONT LOADING ===== */
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal; font-weight: 400 600;
+  font-display: swap;
+  src: local('Cormorant Garamond'), local('CormorantGaramond-Regular');
+}
+</style>
+</head>
+<body class="loading">
+
+<!-- ===== LOADER ===== -->
+<div class="loader" id="loader">
+  <div class="loader-name">
+    <span>七</span><span>里</span><span>水</span><span>巷</span>
+  </div>
+  <div class="loader-bar"></div>
+  <div class="loader-text">Loading Portfolio</div>
+</div>
+
+<!-- ===== CUSTOM CURSOR ===== -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<div class="noise"></div>
+<div class="progress" id="progress"></div>
+
+<!-- ===== NAV ===== -->
+<nav class="nav" id="nav">
+  <a href="#hero" class="nav-logo">七里水巷</a>
+  <ul class="nav-menu">
+    <li><a href="#about">About</a></li>
+    <li><a href="#works">Works</a></li>
+    <li><a href="#venice">Venice</a></li>
+    <li><a href="#series">Series</a></li>
+    <li><a href="#exhibitions">Exhibitions</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="nav-burger" id="burger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="nav-mobile" id="navMobile">
+  <a href="#about">About</a>
+  <a href="#works">Works</a>
+  <a href="#venice">Venice</a>
+  <a href="#series">Series</a>
+  <a href="#exhibitions">Exhibitions</a>
+  <a href="#contact">Contact</a>
+</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+  <div class="hero-bg-wrapper" id="heroBgWrapper">
+    <div class="hero-bg-slide active" style="background-image: url('https://images.unsplash.com/photo-1523906834658-6e75ef0411fa?w=1920&q=85');"></div>
+    <div class="hero-bg-slide" style="background-image: url('https://images.unsplash.com/photo-1534430480872-3498386e7856?w=1920&q=85');"></div>
+    <div class="hero-bg-slide" style="background-image: url('https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=1920&q=85');"></div>
+  </div>
+  <div class="hero-bg-overlay"></div>
+  <div class="hero-bg-vignette"></div>
+  <div class="hero-content">
+    <div class="hero-label">
+      <div class="line"></div>
+      <span>Fine Art Photography · Est. 2019</span>
+    </div>
+    <h1 class="hero-name">
+      <span class="word">七里</span>
+      <span class="word italic">水巷</span>
+    </h1>
+    <p class="hero-subtitle">A photographer's pursuit of light, shadow, and silence — wandering through Venice, Paris, and the old cities of Europe.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <div class="label">Based In</div>
+        <div class="value">Venice · Italy</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="label">Specializing In</div>
+        <div class="value">Fine Art · Travel</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="label">Available</div>
+        <div class="value">Worldwide</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-bg-dots" id="heroDots">
+    <div class="hero-bg-dot active" data-slide="0"></div>
+    <div class="hero-bg-dot" data-slide="1"></div>
+    <div class="hero-bg-dot" data-slide="2"></div>
+  </div>
+  <div class="hero-scroll">
+    <span>Scroll</span>
+    <div class="arrow"></div>
+  </div>
+</section>
+
+<!-- ===== MARQUEE ===== -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span class="marquee-item">Fine Art Photography<span class="dot"></span></span>
+    <span class="marquee-item">Venice<span class="accent">·</span>Italy<span class="dot"></span></span>
+    <span class="marquee-item">Light & Shadow<span class="dot"></span></span>
+    <span class="marquee-item">European Cities<span class="accent">·</span>Series<span class="dot"></span></span>
+    <span class="marquee-item">Fine Art Photography<span class="dot"></span></span>
+    <span class="marquee-item">Venice<span class="accent">·</span>Italy<span class="dot"></span></span>
+    <span class="marquee-item">Light & Shadow<span class="dot"></span></span>
+    <span class="marquee-item">European Cities<span class="accent">·</span>Series<span class="dot"></span></span>
+  </div>
+</div>
+
+<!-- ===== ABOUT ===== -->
+<section class="section" id="about">
+  <div class="section-inner">
+    <div class="section-label reveal">
+      <span class="num">01</span>
+      <div class="line"></div>
+      <span class="title">About the Photographer</span>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal-stagger">
+        <p>七里水巷 is a <strong>fine art photographer</strong> whose work moves between the <span class="accent">ephemeral and the eternal</span> — capturing moments where light, architecture, and human presence converge into stillness.</p>
+        <p>Based between Venice and Shanghai, her practice is rooted in the European photographic tradition: a patient, contemplative approach to seeing. She photographs at dawn and dusk, in the narrow calle of Venice, the courtyards of Vienna, and the mist-covered bridges of old Europe.</p>
+        <p>Her work has been exhibited in galleries across <strong>Italy, France, and China</strong>, and featured in international photography journals. She believes a photograph is not taken — it is <span class="accent">received</span>.</p>
+      </div>
+      <div class="about-info reveal-stagger">
+        <div class="about-info-row"><span class="label">Name</span><span class="value">七里水巷</span></div>
+        <div class="about-info-row"><span class="label">Born</span><span class="value">Hangzhou, China</span></div>
+        <div class="about-info-row"><span class="label">Studio</span><span class="value">Venice, Italy</span></div>
+        <div class="about-info-row"><span class="label">Practice Since</span><span class="value">2019</span></div>
+        <div class="about-info-row"><span class="label">Medium</span><span class="value">Digital · Film</span></div>
+        <div class="about-info-row"><span class="label">Education</span><span class="value">Accademia di Belle Arti</span></div>
+        <div class="about-info-row"><span class="label">Languages</span><span class="value">EN · IT · ZH</span></div>
+        <div class="about-info-row"><span class="label">Represented By</span><span class="value">Galleria del Leone</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WORKS GALLERY ===== -->
+<section class="section" id="works">
+  <div class="section-inner">
+    <div class="section-label reveal">
+      <span class="num">02</span>
+      <div class="line"></div>
+      <span class="title">Selected Works</span>
+    </div>
+    <h2 class="section-heading reveal">A collection of <span class="italic">light and silence</span>, gathered from across the European continent.</h2>
+
+    <div class="gallery-grid">
+      <div class="gallery-item g-large reveal" data-img="https://images.unsplash.com/photo-1523906834658-6e75ef0411fa?w=1600&q=90" data-cat="Venice Series" data-name="Morning Light on the Grand Canal" data-loc="Venice, Italy — 2024" data-index="01">
+        <span class="index">01</span>
+        <div class="gallery-item-inner">
+          <img src="https://images.unsplash.com/photo-1523906834658-6e75ef0411fa?w=800&q=80" alt="Venice Grand Canal morning light" loading="lazy">
+        </div>
+        <div class="overlay">
+          <div class="cat">Venice Series</div>
+          <div class="name">Morning Light on the Grand Canal</div>
+          <div class="loc">Venice, Italy — 2024</div>
+        </div>
+      </div>
+      <div class="gallery-item g-tall reveal" data-img="https://images.unsplash.com/photo-1514890547357-a9ee288728e0?w=1200&q=90" data-cat="Venice Series" data-name="The Calle After Rain" data-loc="Venice, Italy — 2024" data-index="02">
+        <span class="index">02</span>
+        <div class="gallery-item-inner">
+          <img src="https://images.unsplash.com/photo-1514890547357-a9ee288728e0?w=600&q=80" alt="Venice calle after rain" loading="lazy">
+        </div>
+        <div class="overlay">
+          <div class="cat">Venice Series</div>
+          <div class="name">The Calle After Rain</div>
+          <div class="loc">Venice, Italy — 2024</div>
+        </div>
+      </div>
+      <div class="gallery-item g-wide reveal" data-img="https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=1600&q=90" data-cat="European Cities" data-name="Bridge of Sighs at Twilight" data-loc="Venice, Italy — 2023" data-index="03">
+        <span class="index">03</span>
+        <div class="gallery-item-inner">
+          <img src="https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=800&q=80" alt="Bridge of Sighs twilight" loading="lazy">
+        </div>
+        <div class="overlay">
+          <div class="cat">European Cities</div>
+          <div class="name">Bridge of Sighs at Twilight</div>
+          <div class="loc">Venice, Italy — 2023</div>
+        </div>
+      </div>
+      <div class="gallery-item g-square reveal" data-img="https://images.unsplash.com/photo-1499678329028-101435549a4e?w=1200&q=90" data-cat="Architecture" data-name="Cathedral of Silence" data-loc="Florence, Italy — 2023" data-index="04">
+        <span class="index">04</span>
+        <div class="gallery-item-inner">
+          <img src="https://images.unsplash.com/photo-1499678329028-101435549a4e?w=600&q=80" alt="Florence cathedral" loading="lazy">
+        </div>
+        <div class="overlay">
+          <div class="cat">Architecture</div>
+          <div class="name">Cathedral of Silence</div>
+          <div class="loc">Florence, Italy — 2023</div>
+        </div>
+      </div>
+      <div class="gallery-item g-half reveal" data-img="https://images.unsplash.com/photo-1560969184-10fe8719e047?w=1200&q=90" data-cat="Paris Series" data-name="Seine at First Light" data-loc="Paris, France — 2023" data-index="05">
+        <span class="index">05</span>
+        <div class="gallery-item-inner">
+          <img src="https://images.unsplash.com/photo-1560969184-10fe8719e047?w=600&q=80" alt="Paris Seine first light" loading="lazy">
+        </div>
+        <div class="overlay">
+          <div class="cat">Paris Series</div>
+          <div class="name">Seine at First Light</div>
+          <div class="loc">Paris, France — 2023</div>
+        </div>
+      </div>
+      <div class="gallery-item g-half reveal" data-img="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&q=90" data-cat="Vienna Series" data-name="Imperial Courtyards" data-loc="Vienna, Austria — 2022" data-index="06">
+        <span class="index">06</span>
+        <div class="gallery-item-inner">
+          <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&q=80" alt="Vienna courtyard" loading="lazy">
+        </div>
+        <div class="overlay">
+          <div class="cat">Vienna Series</div>
+          <div class="name">Imperial Courtyards</div>
+          <div class="loc">Vienna, Austria — 2022</div>
+        </div>
+      </div>
+      <div class="gallery-item g-third reveal" data-img="https://images.unsplash.com/photo-1543429776-2782fc8e1acd?w=1200&q=90" data-cat="Portraits" data-name="The Gondolier's Gaze" data-loc="Venice, Italy — 2024" data-index="07">
+        <span class="index">07</span>
+        <div class="gallery-item-inner">
+          <img src="https://images.unsplash.com/photo-1543429776-2782fc8e1acd?w=600&q=80" alt="Venetian gondolier portrait" loading="lazy">
+        </div>
+        <div class="overlay">
+          <div class="cat">Portraits</div>
+          <div class="name">The Gondolier's Gaze</div>
+          <div class="loc">Venice, Italy — 2024</div>
+        </div>
+      </div>
+      <div class="gallery-item g-third reveal" data-img="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200&q=90" data-cat="Architecture" data-name="Palazzo Reflections" data-loc="Venice, Italy — 2023" data-index="08">
+        <span class="index">08</span>
+        <div class="gallery-item-inner">
+          <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80" alt="Venice palazzo reflections" loading="lazy">
+        </div>
+        <div class="overlay">
+          <div class="cat">Architecture</div>
+          <div class="name">Palazzo Reflections</div>
+          <div class="loc">Venice, Italy — 2023</div>
+        </div>
+      </div>
+      <div class="gallery-item g-third reveal" data-img="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=90" data-cat="Travel" data-name="Cafe Society" data-loc="Rome, Italy — 2022" data-index="09">
+        <span class="index">09</span>
+        <div class="gallery-item-inner">
+          <img src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80" alt="Rome cafe" loading="lazy">
+        </div>
+        <div class="overlay">
+          <div class="cat">Travel</div>
+          <div class="name">Cafe Society</div>
+          <div class="loc">Rome, Italy — 2022</div>
+        </div>
+      </div>
+      <div class="gallery-item g-full reveal" data-img="https://images.unsplash.com/photo-1534430480872-3498386e7856?w=1800&q=90" data-cat="Venice Series" data-name="Piazza San Marco, Before Dawn" data-loc="Venice, Italy — 2024" data-index="10">
+        <span class="index">10</span>
+        <div class="gallery-item-inner">
+          <img src="https://images.unsplash.com/photo-1534430480872-3498386e7856?w=1200&q=80" alt="St Mark's Square before dawn" loading="lazy">
+        </div>
+        <div class="overlay">
+          <div class="cat">Venice Series</div>
+          <div class="name">Piazza San Marco, Before Dawn</div>
+          <div class="loc">Venice, Italy — 2024</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== VENICE FEATURE ===== -->
+<section class="venice-section" id="venice">
+  <div class="section-inner">
+    <div class="venice-layout">
+      <div class="venice-text">
+        <div class="section-label reveal">
+          <span class="num">03</span>
+          <div class="line"></div>
+          <span class="title">Venice — A Love Letter</span>
+        </div>
+        <h2 class="reveal">The city that <span class="italic">floats</span>,<br>between memory and water.</h2>
+        <p class="reveal">Venice is not merely a place — it is a condition of light. For five years, I have returned to its islands in every season, chasing the hour when the Grand Canal turns to gold and the calle fall silent.</p>
+        <div class="quote reveal">"In Venice, you learn that beauty is not something you find. It is something that finds you — if you are still enough."</div>
+        <p class="reveal">This ongoing series documents the city beyond its postcards: the fishermen at first light, the crumbling facades reflected in green water, the solitude of a piazza emptied by winter fog. Each frame is a conversation with a city that is slowly, gracefully, sinking.</p>
+      </div>
+      <div class="venice-images">
+        <div class="vi reveal">
+          <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=85" alt="Venice canal architecture" loading="lazy">
+        </div>
+        <div class="vi reveal">
+          <img src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=600&q=85" alt="Venice gondola water" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SERIES ===== -->
+<section class="section" id="series">
+  <div class="section-inner">
+    <div class="section-label reveal">
+      <span class="num">04</span>
+      <div class="line"></div>
+      <span class="title">Photographic Series</span>
+    </div>
+    <h2 class="section-heading reveal">Each series is a <span class="italic">chapter</span> — a sustained meditation on a place, a light, a feeling.</h2>
+
+    <div class="series-list">
+      <div class="series-item reveal" data-preview="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80">
+        <span class="s-num">01</span>
+        <span class="s-title"><span class="italic">Acqua Alta</span> — The Rising Tide</span>
+        <span class="s-loc">Venice, Italy</span>
+        <span class="s-year">2024</span>
+        <span class="s-arrow">&#8594;</span>
+      </div>
+      <div class="series-item reveal" data-preview="https://images.unsplash.com/photo-1499678329028-101435549a4e?w=400&q=80">
+        <span class="s-num">02</span>
+        <span class="s-title">Cathedrals of Light</span>
+        <span class="s-loc">Florence · Rome</span>
+        <span class="s-year">2023</span>
+        <span class="s-arrow">&#8594;</span>
+      </div>
+      <div class="series-item reveal" data-preview="https://images.unsplash.com/photo-1560969184-10fe8719e047?w=400&q=80">
+        <span class="s-num">03</span>
+        <span class="s-title"><span class="italic">Le Quai</span> — Banks of the Seine</span>
+        <span class="s-loc">Paris, France</span>
+        <span class="s-year">2023</span>
+        <span class="s-arrow">&#8594;</span>
+      </div>
+      <div class="series-item reveal" data-preview="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80">
+        <span class="s-num">04</span>
+        <span class="s-title">Imperial Stillness</span>
+        <span class="s-loc">Vienna, Austria</span>
+        <span class="s-year">2022</span>
+        <span class="s-arrow">&#8594;</span>
+      </div>
+      <div class="series-item reveal" data-preview="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&q=80">
+        <span class="s-num">05</span>
+        <span class="s-title"><span class="italic">La Passeggiata</span> — The Evening Walk</span>
+        <span class="s-loc">Across Italy</span>
+        <span class="s-year">2022</span>
+        <span class="s-arrow">&#8594;</span>
+      </div>
+      <div class="series-item reveal" data-preview="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400&q=80">
+        <span class="s-num">06</span>
+        <span class="s-title">Old Stones, New Light</span>
+        <span class="s-loc">Prague · Budapest</span>
+        <span class="s-year">2021</span>
+        <span class="s-arrow">&#8594;</span>
+      </div>
+      <div class="series-item reveal" data-preview="https://images.unsplash.com/photo-1534430480872-3498386e7856?w=400&q=80">
+        <span class="s-num">07</span>
+        <span class="s-title"><span class="italic">Silenzio</span> — The Empty Hour</span>
+        <span class="s-loc">Venice, Italy</span>
+        <span class="s-year">2020</span>
+        <span class="s-arrow">&#8594;</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Series hover preview image -->
+<div class="series-preview" id="seriesPreview">
+  <img src="" alt="">
+</div>
+
+<!-- ===== EXHIBITIONS ===== -->
+<section class="section" id="exhibitions">
+  <div class="section-inner">
+    <div class="section-label reveal">
+      <span class="num">05</span>
+      <div class="line"></div>
+      <span class="title">Exhibitions & Recognition</span>
+    </div>
+    <h2 class="section-heading reveal">Selected <span class="italic">exhibitions</span> and awards.</h2>
+
+    <div class="exhibitions-grid">
+      <div class="exh-col">
+        <div class="exh-col-title reveal">Solo Exhibitions</div>
+        <div class="reveal-stagger">
+          <div class="exh-item">
+            <div class="year">2024</div>
+            <div class="title"><span class="italic">Acqua Alta</span></div>
+            <div class="venue">Galleria del Leone, Venice</div>
+          </div>
+          <div class="exh-item">
+            <div class="year">2023</div>
+            <div class="title">Cathedrals of Light</div>
+            <div class="venue">Maison de la Photographie, Paris</div>
+          </div>
+          <div class="exh-item">
+            <div class="year">2022</div>
+            <div class="title"><span class="italic">Imperial Stillness</span></div>
+            <div class="venue">Kunsthalle Wien, Vienna</div>
+          </div>
+          <div class="exh-item">
+            <div class="year">2021</div>
+            <div class="title">First Light</div>
+            <div class="venue">M97 Gallery, Shanghai</div>
+          </div>
+        </div>
+      </div>
+      <div class="exh-col">
+        <div class="exh-col-title reveal">Group Shows & Awards</div>
+        <div class="reveal-stagger">
+          <div class="exh-item">
+            <div class="year">2024</div>
+            <div class="title">Sony World Photography Awards</div>
+            <div class="venue">Shortlist — Landscape Category</div>
+          </div>
+          <div class="exh-item">
+            <div class="year">2023</div>
+            <div class="title">European Photography Prize</div>
+            <div class="venue">Finalist — Fine Art Series</div>
+          </div>
+          <div class="exh-item">
+            <div class="year">2023</div>
+            <div class="title"><span class="italic">Contemporary Venice</span></div>
+            <div class="venue">Palazzo Flangini, Venice</div>
+          </div>
+          <div class="exh-item">
+            <div class="year">2022</div>
+            <div class="title">Voies Off, Arles Festival</div>
+            <div class="venue">Official Selection</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section class="contact" id="contact">
+  <div class="contact-bg"></div>
+  <div class="contact-inner">
+    <div class="contact-label reveal">Get in Touch</div>
+    <h2 class="contact-heading reveal">Let's create something <span class="italic">timeless</span>.</h2>
+    <a href="mailto:hello@qilishuixiang.com" class="contact-email reveal" id="contactEmail">hello@qilishuixiang.com</a>
+    <div class="contact-socials reveal">
+      <a href="#">Instagram</a>
+      <a href="#">Behance</a>
+      <a href="#">VSCO</a>
+      <a href="#">500px</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="footer-logo">七里水巷</div>
+  <div>© 2024 — All Rights Reserved · Venice · Italy</div>
+</footer>
+
+<!-- ===== LIGHTBOX ===== -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lbClose" aria-label="Close">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6L18 18M6 18L18 6"/></svg>
+  </button>
+  <div class="lightbox-counter" id="lbCounter"></div>
+  <img class="lightbox-img" id="lbImg" src="" alt="">
+  <div class="lightbox-nav">
+    <button id="lbPrev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button id="lbNext" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 6l6 6-6 6"/></svg></button>
+  </div>
+  <div class="lightbox-info">
+    <div class="cat" id="lbCat"></div>
+    <div class="name" id="lbName"></div>
+  </div>
+</div>
+
+<script>
+// ===== LOADER =====
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('done');
+    document.body.classList.remove('loading');
+  }, 1800);
+});
+
+// ===== CUSTOM CURSOR =====
+const cursorDot = document.getElementById('cursorDot');
+const cursorRing = document.getElementById('cursorRing');
+let mouseX = 0, mouseY = 0;
+let ringX = 0, ringY = 0;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  cursorDot.style.left = mouseX + 'px';
+  cursorDot.style.top = mouseY + 'px';
+});
+
+function animateRing() {
+  ringX += (mouseX - ringX) * 0.18;
+  ringY += (mouseY - ringY) * 0.18;
+  cursorRing.style.left = ringX + 'px';
+  cursorRing.style.top = ringY + 'px';
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+// Cursor hover states
+document.querySelectorAll('a, button, .gallery-item, .series-item').forEach(el => {
+  el.addEventListener('mouseenter', () => cursorRing.classList.add('hover'));
+  el.addEventListener('mouseleave', () => cursorRing.classList.remove('hover'));
+});
+
+document.addEventListener('mousedown', () => cursorRing.classList.add('click'));
+document.addEventListener('mouseup', () => cursorRing.classList.remove('click'));
+
+// ===== NAV SCROLL =====
+const nav = document.getElementById('nav');
+const progress = document.getElementById('progress');
+
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY;
+  if (scrolled > 60) nav.classList.add('scrolled');
+  else nav.classList.remove('scrolled');
+
+  const docH = document.documentElement.scrollHeight - window.innerHeight;
+  progress.style.width = (scrolled / docH * 100) + '%';
+});
+
+// ===== ACTIVE NAV LINK ON SCROLL =====
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-menu a');
+
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    const top = section.offsetTop - 100;
+    if (window.scrollY >= top) current = section.getAttribute('id');
+  });
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+  });
+});
+
+// ===== BURGER =====
+const burger = document.getElementById('burger');
+const navMobile = document.getElementById('navMobile');
+
+burger.addEventListener('click', () => {
+  burger.classList.toggle('open');
+  navMobile.classList.toggle('open');
+  document.body.style.overflow = navMobile.classList.contains('open') ? 'hidden' : '';
+});
+
+navMobile.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    burger.classList.remove('open');
+    navMobile.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+});
+
+// ===== REVEAL ON SCROLL =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => observer.observe(el));
+
+// ===== HERO BACKGROUND SLIDESHOW =====
+const heroSlides = document.querySelectorAll('.hero-bg-slide');
+const heroDots = document.querySelectorAll('.hero-bg-dot');
+let currentSlide = 0;
+let slideInterval;
+
+function showSlide(index) {
+  heroSlides.forEach(s => s.classList.remove('active'));
+  heroDots.forEach(d => d.classList.remove('active'));
+  heroSlides[index].classList.add('active');
+  heroDots[index].classList.add('active');
+  currentSlide = index;
+}
+
+function nextSlide() {
+  showSlide((currentSlide + 1) % heroSlides.length);
+}
+
+function startSlideshow() {
+  slideInterval = setInterval(nextSlide, 6000);
+}
+
+heroDots.forEach((dot, i) => {
+  dot.addEventListener('click', () => {
+    clearInterval(slideInterval);
+    showSlide(i);
+    startSlideshow();
+  });
+});
+
+startSlideshow();
+
+// ===== HERO MOUSE PARALLAX =====
+const heroBgWrapper = document.getElementById('heroBgWrapper');
+const hero = document.getElementById('hero');
+
+hero.addEventListener('mousemove', (e) => {
+  const rect = hero.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / rect.width - 0.5;
+  const y = (e.clientY - rect.top) / rect.height - 0.5;
+  heroBgWrapper.style.transform = `translate(${x * -20}px, ${y * -20}px)`;
+});
+
+hero.addEventListener('mouseleave', () => {
+  heroBgWrapper.style.transform = 'translate(0, 0)';
+});
+
+heroBgWrapper.style.transition = 'transform 0.6s var(--ease)';
+
+// ===== GALLERY 3D TILT =====
+document.querySelectorAll('.gallery-item').forEach(item => {
+  const inner = item.querySelector('.gallery-item-inner');
+  if (!inner) return;
+
+  item.addEventListener('mousemove', (e) => {
+    const rect = item.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    const rotateX = y * -8;
+    const rotateY = x * 8;
+    inner.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+  });
+
+  item.addEventListener('mouseleave', () => {
+    inner.style.transform = 'perspective(800px) rotateX(0) rotateY(0) scale(1)';
+  });
+});
+
+// Gallery inner transition
+document.querySelectorAll('.gallery-item-inner').forEach(inner => {
+  inner.style.transition = 'transform 0.3s ease-out';
+});
+
+// ===== SERIES HOVER PREVIEW =====
+const seriesPreview = document.getElementById('seriesPreview');
+const seriesPreviewImg = seriesPreview.querySelector('img');
+const seriesItems = document.querySelectorAll('.series-item');
+
+// Preload images
+seriesItems.forEach(item => {
+  const img = new Image();
+  img.src = item.dataset.preview;
+});
+
+seriesItems.forEach(item => {
+  item.addEventListener('mouseenter', () => {
+    seriesPreviewImg.src = item.dataset.preview;
+    seriesPreview.classList.add('show');
+  });
+  item.addEventListener('mouseleave', () => {
+    seriesPreview.classList.remove('show');
+  });
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (seriesPreview.classList.contains('show')) {
+    const x = e.clientX + 30;
+    const y = e.clientY - 180;
+    seriesPreview.style.left = Math.min(x, window.innerWidth - 300) + 'px';
+    seriesPreview.style.top = Math.max(y, 20) + 'px';
+  }
+});
+
+// ===== MAGNETIC CONTACT EMAIL =====
+const contactEmail = document.getElementById('contactEmail');
+
+contactEmail.addEventListener('mousemove', (e) => {
+  const rect = contactEmail.getBoundingClientRect();
+  const x = e.clientX - rect.left - rect.width / 2;
+  const y = e.clientY - rect.top - rect.height / 2;
+  contactEmail.style.transform = `translate(${x * 0.3}px, ${y * 0.4}px)`;
+});
+
+contactEmail.addEventListener('mouseleave', () => {
+  contactEmail.style.transform = 'translate(0, 0)';
+});
+
+contactEmail.style.transition = 'transform 0.4s var(--ease)';
+
+// ===== LIGHTBOX =====
+const lightbox = document.getElementById('lightbox');
+const lbImg = document.getElementById('lbImg');
+const lbCat = document.getElementById('lbCat');
+const lbName = document.getElementById('lbName');
+const lbCounter = document.getElementById('lbCounter');
+const galleryItems = Array.from(document.querySelectorAll('.gallery-item'));
+let currentIndex = 0;
+
+function openLightbox(index) {
+  currentIndex = index;
+  const item = galleryItems[index];
+  lbImg.src = item.dataset.img;
+  lbCat.textContent = item.dataset.cat;
+  lbName.textContent = item.dataset.name;
+  lbCounter.textContent = String(index + 1).padStart(2, '0') + ' / ' + String(galleryItems.length).padStart(2, '0');
+  lightbox.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  lightbox.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function navigate(dir) {
+  currentIndex = (currentIndex + dir + galleryItems.length) % galleryItems.length;
+  const item = galleryItems[currentIndex];
+  lbImg.style.opacity = '0';
+  setTimeout(() => {
+    lbImg.src = item.dataset.img;
+    lbCat.textContent = item.dataset.cat;
+    lbName.textContent = item.dataset.name;
+    lbCounter.textContent = String(currentIndex + 1).padStart(2, '0') + ' / ' + String(galleryItems.length).padStart(2, '0');
+    lbImg.style.opacity = '1';
+  }, 200);
+}
+
+galleryItems.forEach((item, i) => {
+  item.addEventListener('click', () => openLightbox(i));
+});
+
+document.getElementById('lbClose').addEventListener('click', closeLightbox);
+document.getElementById('lbPrev').addEventListener('click', (e) => { e.stopPropagation(); navigate(-1); });
+document.getElementById('lbNext').addEventListener('click', (e) => { e.stopPropagation(); navigate(1); });
+lightbox.addEventListener('click', (e) => {
+  if (e.target === lightbox) closeLightbox();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (!lightbox.classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') navigate(-1);
+  if (e.key === 'ArrowRight') navigate(1);
+});
+
+lbImg.style.transition = 'opacity 0.3s ease';
+
+// ===== SWIPE GESTURE FOR LIGHTBOX ON MOBILE =====
+let touchStartX = 0;
+lightbox.addEventListener('touchstart', (e) => {
+  touchStartX = e.touches[0].clientX;
+});
+lightbox.addEventListener('touchend', (e) => {
+  const touchEndX = e.changedTouches[0].clientX;
+  const diff = touchStartX - touchEndX;
+  if (Math.abs(diff) > 50) {
+    if (diff > 0) navigate(1);
+    else navigate(-1);
+  }
+});
+
+// ===== SMOOTH SCROLL FOR NAV LINKS =====
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+</body>
+</html>
